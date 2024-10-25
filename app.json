@@ -18,10 +18,24 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.leonardobarral.projetotesteapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "00844620-f688-42cf-9829-a1e34bffa7e4"
+      }
+    },
+
+    "plugins": [
+      
+      "expo-font"
+
+    ]
   }
 }
+
+ 
