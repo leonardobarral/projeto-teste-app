@@ -1,46 +1,89 @@
 import React, { SetStateAction, useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, Image, View } from 'react-native';
 
+type Props = {
+  imagePath: any;
+  text1: string;
+  text2: string;
+  text3: string;
+  // text4: string;
+  selecting: boolean;
+  longPress?: () => void;
+  number?: (value: number) => void;
+  action?: (it:[string,string]) => void;
+};
 
 
-export const CardM3 = ({imagePath, text1,text2,text3,text4,selectable,onLongPress,selectableNumber}) => {
-  const [selected, setSelected] = useState(false);
-  const toggleSelected = (value: SetStateAction<boolean>) => {
-    setSelected(value);
+
+export const CardM3 = ({
+  imagePath, 
+  text1,
+  text2,
+  text3,
+  // text4,
+  selecting,
+  longPress,
+  number,
+  action
+}:Props) => {
+  
+  const [status, setStatus] = useState(false);
+  const toggleStatus = (value: boolean) => {
+    setStatus(value);
+    if(value &&  action){
+      action([imagePath,'add'])
+    }
+    if(!value &&  action){
+      action([imagePath,'remove'])
+    }
   };
-
-  // const [backGroundColor, setBackGroundColor] = useState("#FFFFFFBD");
-  // const toggleBackGroundColor = (value: SetStateAction<string>) => {
-  //   if(selected){
-  //     setBackGroundColor("#ADD1F4");
+  // const toggleStatus = (value: boolean) => {
+  //   setStatus(value);
+  //   if(value && number){
+  //     number(+1)
+  //   }
+  //   if(!value && number){
+  //     number(-1)
   //   }
   // };
-  const backgroundColor = selected ? "#ADD1F4" : "#FFFFFFBD";
-  return (
-    <TouchableOpacity style={[styles.button, { backgroundColor }]} 
-    onLongPress={onLongPress}
-    onPress={()=>{
-      if(selectable){
-        var newStatus = !selected
-        toggleSelected(newStatus)
-        if(newStatus){
-          selectableNumber(1)
-        }else{
-          selectableNumber(-1)
-        }
+  
+  const backgroundColor = status ? "#ADD1F4" : "#f4eeee";
 
+
+  return (
+    <TouchableOpacity 
+    style={[styles.button, { backgroundColor }]} 
+
+    onPress={()=>{
+      if(selecting){
+        if(status) toggleStatus(false)
+        else(toggleStatus(true))
       }
-    }    
-    }>
-      <Image
-        source={imagePath}
-        style={styles.image}
-      />
-      <View style = {styles.containerText}>
-        <Text style={styles.text1}>{text1}</Text>
-        <Text style={styles.text2}>{text2}</Text>
-        <Text style={styles.text3}>{text3}</Text>
-        <Text style={styles.text3}>{text4}</Text>
+    }}
+    
+    onLongPress={()=>{
+      if(selecting){
+        toggleStatus(!status)
+      }
+      if(!selecting){
+        if(longPress)longPress()
+          toggleStatus(true)
+      }
+    
+    }}
+    >
+      <View style={styles.container}>
+        
+        
+        <Image
+          source={typeof(imagePath) == 'number'?imagePath: {uri: `${imagePath}` }}
+          style={styles.image}
+        />
+        <View style = {styles.containerText}>
+          <Text style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{text1}</Text>
+          <Text style={styles.text2}>{text2}</Text>
+          <Text style={styles.text3}>{text3}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -53,17 +96,30 @@ const styles = StyleSheet.create({
     paddingVertical : 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    gap:16,
-    flexDirection : 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
     verticalAlign: 'middle',
-    shadowColor: '#2B6197BF',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.75,
     shadowRadius: 12,
-    elevation: 10, 
+    elevation: 12, 
+    marginBottom:10,
+    marginTop:10,
+    // marginHorizontal:20,
+    // position:'relative'
   },
+
+  container : {
+    width : '100%',
+    height : 90,
+    flexDirection : 'row',
+    columnGap :16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical : 'auto',
+  },
+
   image:{
     height : 85,
     width : 85,
@@ -73,13 +129,14 @@ const styles = StyleSheet.create({
     flex : 1,
     flexDirection : 'column',
     justifyContent : 'flex-start',
-    alignItems : 'flex-start'
+    alignItems : 'flex-start',
+    height : '100%'
   },
 
   text1: {
     height: 24,
     fontSize: 14,
-    lineHeight: 24,
+    lineHeight: 20,
     fontWeight: '500',
     color: '#1C170D',
     // fontFamily: 'Plus Jakarta Sans',

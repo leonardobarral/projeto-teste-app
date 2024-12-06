@@ -2,10 +2,10 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native'
-import { StackTypes } from '../routes';
+import { AppStack } from '../routes/AppStack'
 
 export const CardM2 = ({imagePath, text, page }) => {
-  const navigation = useNavigation<StackTypes>();
+  const navigation = useNavigation<AppStack>();
   return (
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(page)}>
       <Image
@@ -24,17 +24,18 @@ const styles = StyleSheet.create({
     paddingVertical : 10,
     borderRadius: 20,
     borderWidth : 1,
+    borderColor : "#00000017",
     flexDirection : 'column',
-    alignItems: 'center',
+    alignItems: 'center', 
     verticalAlign: 'middle',
     justifyContent: 'center',
     width: '100%',
     height: 100,
     padding : 10,
-    shadowColor: '#2B6197BF',
+    shadowColor: '#2b6197',
     shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
+    shadowOpacity: 0.75,
+    shadowRadius: 10,
     elevation: 10, 
   },
   image:{

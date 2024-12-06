@@ -1,9 +1,19 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet, Image } from 'react-native';
 
-export const ButtonComponentCircleM2 = ({imagePath}) => {
+type Props = {
+  imagePath: any;
+  onPress?: () => void;
+};
+
+export const ButtonComponentCircleM2 = ({imagePath,onPress}:Props) => {
   return (
-    <TouchableOpacity style={styles.button} >
+    <TouchableOpacity 
+      style={styles.button}
+      onPress={()=>{
+        if(onPress) onPress();
+      }}
+    >
       <Image
         source={imagePath}
         style={styles.image}
@@ -14,7 +24,7 @@ export const ButtonComponentCircleM2 = ({imagePath}) => {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#D9D9D978',
+    backgroundColor: '#c8c8c8',
     borderRadius: 37.5,
     flexDirection : 'column',
     alignItems: 'center',
@@ -23,16 +33,16 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     
-    shadowColor: '#00000040',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.75,
     shadowRadius: 4,
     elevation: 4, 
-   
+
   },
   image:{
-    height : 30,
-    width : 30,
+    // height : 22,
+    width : 22.5,
   },
 
 });

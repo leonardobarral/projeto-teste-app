@@ -2,20 +2,31 @@ import React from 'react';
 import {  Text, StyleSheet, View, ImageBackground } from 'react-native';
 import { ButtonBack } from './ButtonBack';
 import { ButtonShowbar } from './ButtonShowbar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+type Props = {
+  title: string;
+  navigation : any;
+  press?: () => void;
+};
 
-export const HeaderM2 = ({title,navigation}) => {
+export const HeaderM2 = ({title,navigation,press}:Props) => {
+  const insets = useSafeAreaInsets();
+  const headerHeight = 68 + insets.top;
   return (
-    <View style={styles.view}>
+    <View style={[styles.view, {height: headerHeight }]}>
       <ImageBackground
-        source={require('../../assets/images/Ellipse1.jpg')}
-        style={styles.image}
+        source={require('../assets/images/Ellipse1.jpg')}
+        style={[styles.image, {height: headerHeight }]}
         resizeMode="cover"
       ></ImageBackground>
-      <View style={styles.menu}>
+      <View style={[styles.menu, {top: insets.top }]}>
         <ButtonBack navigation={navigation}/>
         <Text style={styles.title}>{title}</Text>
-        <ButtonShowbar/>
+        <ButtonShowbar press={() =>{
+          if(press){
+            press()
+          }}}/>
       </View>
     </View>
   );
@@ -37,7 +48,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     // marginTop: -192,
     width: '100%',
-    height: 68,
+    // height: 68,
     opacity : 1
   },
   menu:{

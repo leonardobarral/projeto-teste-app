@@ -1,15 +1,15 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-import {useNavigation} from '@react-navigation/native'
-import { StackTypes } from '../routes';
 
-export const ButtonComponent = ({ name,page }) => {
+type Props = {
+  name: any;
+  press?: () => void;
+};
 
-  const navigation = useNavigation<StackTypes>();
-
+export const ButtonComponent = ({ name,press}:Props) => {
   return (
-    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(page)} >
+    <TouchableOpacity style={styles.button} onPress={press} >
       <Text style={styles.textName}>{name}</Text>
     </TouchableOpacity>
   );

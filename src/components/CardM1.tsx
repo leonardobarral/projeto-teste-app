@@ -2,10 +2,10 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native'
-import { StackTypes } from '../routes';
+import { AppStack } from '../routes/AppStack'
 
 export const CardM1 = ({imagePath, text ,page}) => {
-  const navigation = useNavigation<StackTypes>();
+  const navigation = useNavigation<AppStack>();
   return (
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(page)}>
       <Image
@@ -19,7 +19,7 @@ export const CardM1 = ({imagePath, text ,page}) => {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFDFD',
     paddingHorizontal: 40,
     paddingVertical : 10,
     borderRadius: 20,
@@ -31,10 +31,10 @@ const styles = StyleSheet.create({
     height: 125,
     padding : 10,
     gap:15,
-    shadowColor: '#2B6197BF',
+    shadowColor: '#2b6197',
     shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
+    shadowOpacity: 0.75,
+    shadowRadius: 10,
     elevation: 10, 
   },
   image:{

@@ -1,25 +1,40 @@
 import React from 'react';
-import { Text, StyleSheet, Image, View, ImageBackground } from 'react-native';
+import { Text, StyleSheet, Image, View, ImageBackground, TouchableOpacity } from 'react-native';
 import { ButtonShowbar } from './ButtonShowbar';
+import {useNavigation} from '@react-navigation/native'
+import { AppStack } from '../routes/AppStack'
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+type Props = {
+  title: string;
+  press?: () => void;
+  imagem: any;
+};
 
-export const HeaderM3 = ({title}) => {
+export const HeaderM3 = ({title,press,imagem}:Props) => {
+  const navigation = useNavigation<AppStack>();
+  const insets = useSafeAreaInsets();
+  const headerHeight = 68 + insets.top;
   return (
-    <View style={styles.view}>
+    <View style={[styles.view, {height: headerHeight }]}>
       <ImageBackground
-        source={require('../../assets/images/Ellipse1.jpg')}
-        style={styles.image}
+        source={require('../assets/images/Ellipse1.jpg')}
+        style={[styles.image, {height: headerHeight }]}
+        // style={styles.image}
         resizeMode="cover"
       ></ImageBackground>
-      <View style={styles.menu}>
-        <View style={styles.menuUser}>
+      <View style={[styles.menu, {top: insets.top }]}>
+        <TouchableOpacity style={styles.menuUser} onPress = {()=> navigation.navigate('User')}>
           <Image
-            source={require('../../assets/images/user.jpg')}
-            style={styles.imageUser}
-          />
+              source={imagem !== ''? {uri: `${imagem}`}:require('../assets/images/simbolo-do-usuario.png')}
+              style={styles.imageUser}
+            />
           <Text style={styles.title}>{title}</Text>
-        </View>
-        <ButtonShowbar/>
+        </TouchableOpacity>
+        <ButtonShowbar press={() =>{
+          if(press){
+            press()
+          }}}/>
       </View>
     </View>
   );
@@ -41,7 +56,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     // marginTop: -192,
     width: '100%',
-    height: 68,
+    // height: 68,
     opacity : 1
   },
   menu:{
@@ -59,7 +74,6 @@ const styles = StyleSheet.create({
     alignItems : 'center',
     alignContent:'center',
     justifyContent : 'flex-start',
-    height : '100%',
     gap : 15
   },
   imageUser:{
@@ -76,7 +90,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'center',
     alignContent:'center',
-    flex : 1
+    // flex : 1
   }
 
 });

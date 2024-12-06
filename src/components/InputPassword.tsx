@@ -3,10 +3,23 @@ import { StyleSheet, TextInput, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
-export const InputPassword = ({ placeHolder , keyboardType}) => {
+type Props = {
+  placeHolder: any;
+  keyboardType: any;
+  onChangeText?: (it:string) => void;
+};
+
+
+export const InputPassword = ({ placeHolder , keyboardType,onChangeText}:Props) => {
   const [text, setText] = useState('');
 
   const [security, setVisible] = useState(true);
+
+  const toggletext = (it:string)=>{
+    setText(it)
+    if(onChangeText) onChangeText(it)
+  }
+
 
   const toggleSecureEntry = () => {
     setVisible(!security);
@@ -17,10 +30,11 @@ export const InputPassword = ({ placeHolder , keyboardType}) => {
       <TextInput style={styles.input}
         placeholder= {placeHolder}
         value = {text}
-        onChangeText = {setText}
+        onChangeText={toggletext}
         keyboardType={keyboardType}
         placeholderTextColor='#a17d1c8d'
         secureTextEntry ={security}
+        autoCapitalize="none"
       />
       <TouchableOpacity onPress={toggleSecureEntry} style={styles.icon}>
         <Icon name={security ? 'visibility-off' : 'visibility'} size={20} color='#807979' />
@@ -39,7 +53,7 @@ const styles = StyleSheet.create({
   
   input:{
     height: 56,
-    borderColor: '#FEF4D8',
+    borderColor: '#F0E3C2',
     borderWidth: 1,
     borderRadius: 12, 
     padding: 16,
@@ -52,16 +66,7 @@ const styles = StyleSheet.create({
     lineHeight : 24,
   },
 
-  textName: {
-    color: '#ffffff',
-    fontSize: 16,
-    // fontFamily: 'Inter',
-    fontWeight: '700',
-    lineHeight: 24,
-    textAlign: 'center',
-    height: 24,
-    alignContent:'center'
-  },
+
   icon:{
     position: 'absolute',
     right: 16,

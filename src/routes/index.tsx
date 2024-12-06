@@ -1,37 +1,27 @@
-import * as React from 'react';
+import React,{useState,useEffect  } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator,NativeStackNavigationProp } from '@react-navigation/native-stack';
-import {  SafeAreaView} from 'react-native';
+import {AuthStack} from './AuthStack';
+import {AppStack} from './AppStack';
+import auth,{FirebaseAuthTypes} from "@react-native-firebase/auth"
+import { ActivityIndicator, View } from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useUser } from '../context/Auth';
 
-import Login from '../screens/Login';
-import Cadastro from '../screens/Cadastro';
-import Home from '../screens/Home';
-import MeusArquivosImagens from '../screens/MeusArquivosImagens';
-import MeusArquivos from '../screens/MeusArquivos';
+export function Router(){
 
+  const{user,initializing} = useUser();
 
-const Stack = createNativeStackNavigator();
+  if(initializing){
+  return(
+    <View style = {{flex:1,justifyContent : 'center',alignItems:'center'}}>
+      <ActivityIndicator size = {'large'} color={Colors.primary}/>
+    </View>
+  )
+  }
 
-type StackNavigation = {
- Login : undefined,
- Cadastro : undefined,
- Home : undefined,
- MeusArquivos : undefined,
- MeusArquivosImagens : undefined
-} 
-
-export type StackTypes = NativeStackNavigationProp<StackNavigation>
-
-export default function StackComponent() {
- return (
-  <NavigationContainer>
-   <Stack.Navigator>
-    <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
-    <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }}/>
-    <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
-    <Stack.Screen name="MeusArquivosImagens" component={MeusArquivosImagens} options={{ headerShown: false }}/>
-    <Stack.Screen name="MeusArquivos" component={MeusArquivos} options={{ headerShown: false }}/>
-   </Stack.Navigator>
+ return(
+  <NavigationContainer>  
+    {user ? <AppStack/> : <AuthStack/>}
   </NavigationContainer>
  );
 }

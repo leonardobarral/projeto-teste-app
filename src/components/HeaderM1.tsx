@@ -5,7 +5,7 @@ export const HeaderM1 = () => {
   return (
     <View style={styles.view}>
       <ImageBackground
-        source={require('../../assets/images/Ellipse2.png')}
+        source={require('../assets/images/Ellipse2.png')}
         style={styles.image}
         resizeMode="cover"
       ></ImageBackground>
@@ -14,15 +14,15 @@ export const HeaderM1 = () => {
 };
 
 const styles = StyleSheet.create({
-    view: {
-      alignItems: 'center',
-      width: '100%',
-      height: 135
+  view: {
+    alignItems: 'center',
+    width: '100%',
+    height: 135
   },
   image: {
-    marginTop: -125,
-    width: 430,
-    height: 260,
+    marginTop: 0,
+    width: '100%',
+    height: 150,
     opacity : 1
   }
 });
