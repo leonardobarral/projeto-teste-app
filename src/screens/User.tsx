@@ -1,4 +1,4 @@
-import { StyleSheet, View, TouchableOpacity, Text, Modal, Alert } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Modal, Alert, ActivityIndicator } from 'react-native';
 
 
 import { HeaderM4 } from '../components/HeaderM4';
@@ -22,7 +22,7 @@ import React from "react";
 
 
 export default function Login() {
-  
+  const [spiner, setSpiner] = useState(false);
   const{signOut,modifyPassword,user,usuario} = useUser();
   
   const [imagem, setImagem] = useState(usuario.imagem);
@@ -115,9 +115,9 @@ export default function Login() {
       return trimmedInput;
     }
     return trimmedInput.replace(/[^\d]/g,"");
-};
+  };
 
-const validarCampos = () => {
+  const validarCampos = () => {
     if (!name?.trim()) {
       Alert.alert("Erro", "O campo Nome é obrigatório.");
       return false;
@@ -157,6 +157,7 @@ const validarCampos = () => {
   }
 
   const handleModifyUsuario = async ()=>{
+    setSpiner(true)
     try{
       if(validarCampos()){
         const userCollectionRef = firestore().collection("usuario");
@@ -175,11 +176,12 @@ const validarCampos = () => {
           };
 
           if(filename&&filePath){
-            await storage().ref(`user/${filename}`).putFile(filePath).then((e)=>{
-              console.log("Operação realizada")
-              // console.log("e.metadata.fullPath:",e.metadata.fullPath)
-              updatedUserData.imagem = `https://firebasestorage.googleapis.com/v0/b/teste-atauan.firebasestorage.app/o/${e.metadata.fullPath}?alt=media`.replace('user/','user%2F')
-            })
+            const storageRef = await storage().ref(`user/${auth().currentUser?.uid}/${filename}`)
+            await storageRef.putFile(filePath);
+            const downloadURL = await storageRef.getDownloadURL();
+            console.log("Operação realizada")
+            updatedUserData.imagem = downloadURL
+            
           }
 
           await userCollectionRef.doc(uid).update(updatedUserData);
@@ -190,15 +192,20 @@ const validarCampos = () => {
           );
 
           handleSignOut()
+          setSpiner(false)
 
         }else { 
+          setSpiner(false)
           Alert.alert("Erro", "Usuário não encontrado.");
         }
       }else{
+        setSpiner(false)
         Alert.alert("Algum dado está inconsistente");
       }
-    }catch{
+    }catch(error){
+      setSpiner(false)
       Alert.alert("Erro de atualização, tente novemente.");
+      console.log(error)
       setEditable(false)
     }
   }
@@ -207,15 +214,18 @@ const validarCampos = () => {
 
 
   const handleModifyPassword = async() => {
+    setSpiner(true)
     try{
-      if(user && user.email){
+      if(user && user.email){ 
         await modifyPassword(user.email);
         toggleVisible(true);
+        setSpiner(false)
       }else{
+        setSpiner(false)
         Alert.alert("Usuário não encontrado ou sem e-mail disponível.");
       }
-
     }catch (error) {
+      setSpiner(false)
       Alert.alert("Erro ao fazer logout, tente novamente");
     };
   }
@@ -228,6 +238,15 @@ const validarCampos = () => {
     setEditable(it)
     
   }
+
+  const handleSelectImage = async (source: 'camera' | 'file') => {
+    const imagePath = source === 'camera' ? await camera3x4() : await fileImage3x4();
+  
+    if (imagePath) {
+      setImageUpLoad(imagePath); 
+      setImagem(imagePath);
+    }
+  };
   
 
   const headerHeight = 150 + insets.top;
@@ -284,7 +303,17 @@ const validarCampos = () => {
           </View>
         </TouchableOpacity>
       </Modal>
-      <ModalGetFilOrImagem visible = {visibleManagerFile} setVisible={setVisibleManagerFile} functionCamera={async ()=>{setImageUpLoad(await camera3x4())}} functionFile={async ()=>{setImageUpLoad(await fileImage3x4())}}/>
+            <Modal
+              transparent
+              visible={spiner}
+              animationType="fade"
+              // onRequestClose={() => toggleisPopupVisible(false)}
+            >
+              <View style={{flexDirection:'column',backgroundColor:'#ffffff50',justifyContent:'center',alignItems:'center',width:"100%",height:'100%'}}>
+                <ActivityIndicator size="large" />
+              </View>
+            </Modal>
+      <ModalGetFilOrImagem visible = {visibleManagerFile} setVisible={setVisibleManagerFile} functionCamera={async ()=>{handleSelectImage("camera")}} functionFile={async ()=>{handleSelectImage('file')}}/>
     </View>
   );
 }
