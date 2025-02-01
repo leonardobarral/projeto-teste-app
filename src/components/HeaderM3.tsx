@@ -26,7 +26,7 @@ export const HeaderM3 = ({title,press,imagem}:Props) => {
       <View style={[styles.menu, {top: insets.top }]}>
         <TouchableOpacity style={styles.menuUser} onPress = {()=> navigation.navigate('User')}>
           <Image
-              source={imagem !== ''? {uri: `${imagem}`}:require('../assets/images/simbolo-do-usuario.png')}
+              source={imagem? {uri: `${imagem}`}:require('../assets/images/simbolo-do-usuario.png')}
               style={styles.imageUser}
             />
           <Text style={styles.title}>{title}</Text>
@@ -67,7 +67,8 @@ const styles = StyleSheet.create({
     width : '100%',
     height : 68,
     paddingVertical : 14,
-    paddingHorizontal : 24
+    paddingLeft : 12,
+    paddingRight : 18,
   },
   menuUser:{
     flexDirection : 'row',
@@ -77,17 +78,17 @@ const styles = StyleSheet.create({
     gap : 15
   },
   imageUser:{
-    width : 40,
-    height : 40,
-    borderRadius : 20,
+    width : 50,
+    height : 50,
+    borderRadius : 25,
     alignContent : 'center'
   },
   title:{
     // fontFamily : 'Poppins-Regular',
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 24,
+    fontSize: 28,
+    fontWeight: '400',
+    lineHeight: 35,
     textAlign: 'center',
     alignContent:'center',
     // flex : 1

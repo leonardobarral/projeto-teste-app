@@ -56,6 +56,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
         if(_user && auth().currentUser){
           try{
 
+            if (!_user.emailVerified) {
+              await auth().currentUser?.sendEmailVerification()
+              Alert.alert("E-mail não verificado","Acesse no e-mail cadastrado, clique no link enviado e tente novamente!");
+              await auth().signOut();
+              AsyncStorage.removeItem("@user");
+              setUsuario({} as UsuarioType);
+              return;
+            }
+            
+
             const querySnapshot = await firestore().collection("usuario").where("email", "==", _user.email).get();
             
             if (!querySnapshot.empty) {
@@ -141,6 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
           handleError(error)
           setInitializing(false);
         })
+
       }else{
         setInitializing(false);
         handleError('Credenciais não inseridas.')
@@ -202,4 +213,32 @@ export const handleError = (error: any) => {
   }
 };
 
+
+export type fileDoc = {
+  id:string,
+  cidade : string,
+  dataCadastro : string,
+  dataCriacao : string,
+  uid: string,
+  type: string,
+  url:string,
+  extencao:string,
+  nome:string,
+  geolocalizacao:{
+    latitude:string,
+    longitute:string
+  },
+  uf:string
+}
+
+export type records = {
+  id:string,
+  dataCadastro: string,
+  dataCriacao: string,
+  type: string,
+  cidade: string,
+  quantidade: number ,
+  uf:string
+  timestamp: number
+}
 

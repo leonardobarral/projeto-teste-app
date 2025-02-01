@@ -1,4 +1,4 @@
-import {  Modal, SafeAreaView, StyleSheet, TouchableOpacity, View, Text ,Alert} from 'react-native';
+import {  Modal, SafeAreaView, StyleSheet, TouchableOpacity, View, Text ,Alert, ActivityIndicator} from 'react-native';
 
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -32,7 +32,9 @@ export default function Home() {
   //carregamento de dados pessoais
   const{user,usuario,visibleBar,setVisibleBar} = useUser();
   const [name, setName] = useState(usuario.nome || 'carregando...');
-  const [imagem, setImagem] = useState(usuario.imagem);
+  const [imagem, setImagem] = useState(usuario.imagem||null);
+
+  const [spiner, setSpiner] = useState(false);
 
   const maskFirtsName = (name:string)=>{
     if(name) return name.split(" ")[0]
@@ -44,30 +46,59 @@ export default function Home() {
     setImagem(usuario.imagem)
   },[usuario])
 
-
+  //camera diretamente
   const handleCamera = async()=>{
-    const image = await camera()
+    const imageDados = await camera()
+    const currentDate = new Date();
+    const formattedDateTime = new Intl.DateTimeFormat('pt-BR', { 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit',
+    }).format(currentDate);
     setPopupVisible(false)
     
-    handleStorage(image,'imagem','')
+    handleStorage(imageDados,'imagem','',formattedDateTime,"31.7700","52.3313","Pelotas","RS")
   }
 
+  //galeria de imagens
   const handleGallery = async()=>{
     const image = await fileImage()
     setPopupVisible(false)
+    const currentDate = new Date();
+    const formattedDateTime = new Intl.DateTimeFormat('pt-BR', { 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit',
+    }).format(currentDate);
     
-    handleStorage(image,'imagem','')
+    handleStorage(image,'imagem','',formattedDateTime,"31.7700","52.3313","Pelotas","RS")
   }
   
+
+  //galeria de documentos
   const handleFiles = async()=>{
     setPopupVisible(false)
     const image = await file()
-      
-    
+    const currentDate = new Date();
+    const formattedDateTime = new Intl.DateTimeFormat('pt-BR', { 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit',
+    }).format(currentDate);
     if(image){
-      handleStorage(image.uri,'documento',image.name)
+      handleStorage(image.uri,'documento',image.name,formattedDateTime,"31.7700","52.3313","Pelotas","RS")
     }
   }
+
 
   const openFolder = async (path:any) => {
     navigation.navigate(path)
@@ -76,7 +107,8 @@ export default function Home() {
 
 
   //funcão de carregamento de imagem de camera:
-  const handleStorage = async (image:any,type:string,name:string)=>{
+  const handleStorage = async (image:any,type:string,name:string,time:any,latitude:any,longitude:any,cidade:string,uf:string)=>{
+    setSpiner(true)
     try{
 
       if(image){
@@ -101,25 +133,43 @@ export default function Home() {
           hour: '2-digit', 
           minute: '2-digit', 
           second: '2-digit',
-      }).format(currentDate);
+        }).format(currentDate);
+
+        
         
         const fileDoc = {
-          cidade : 'São paulo, SP'.toLocaleLowerCase(),
-          data : formattedDateTime,
+          dataCriacao:time,
+          cidade : cidade.toLocaleLowerCase(),
+          dataCadastro : formattedDateTime,
           uid: user?.uid,
           type: type,
           url:'',
           extencao:extecao,
-          nome: newName.toLocaleLowerCase()
+          nome: newName.toLocaleLowerCase(),
+          geolocalizacao:{
+            latitude:latitude,
+            longitute:longitude
+          },
+          status:true,
+          uf:uf.toLocaleLowerCase(),
         }
         
         //subindo imagem
         if(filename && filePath){
 
-          await storage().ref(`files/${filename}`).putFile(filePath).then((e)=>{
-            fileDoc.url = `https://firebasestorage.googleapis.com/v0/b/teste-atauan.firebasestorage.app/o/${e.metadata.fullPath}?alt=media`.replace('files/','files%2F').replace(" ","_")
-          })
+          const storageRef = await storage().ref(`files/${user?.uid}/${filename}`)
+          await storageRef.putFile(filePath);
+
+          const downloadURL = await storageRef.getDownloadURL();
+          fileDoc.url=downloadURL
+          
+          
+          // .then((e)=>{
+          // // await storage().ref(`files/${filename}`).putFile(filePath).then((e)=>{
+          //   fileDoc.url = `https://firebasestorage.googleapis.com/v0/b/teste-atauan.firebasestorage.app/o/${e.metadata.fullPath}?alt=media&token=${e.metadata.downloadTokens}`.replace('files/','files%2F').replace(" ","_")
+          // })
         }else{
+          setSpiner(false)
           return;
         }
         
@@ -128,7 +178,7 @@ export default function Home() {
         await filesCollection.add(fileDoc);
 
 
-
+        setSpiner(false)
         Alert.alert("Sucesso","Documento enviado!",
           [
             {
@@ -144,8 +194,12 @@ export default function Home() {
       
       }
     }catch(error){
+      console.error(error)
+      setSpiner(false)
       handleError(error)
+
     }
+    setSpiner(false)
   }
   
 
@@ -199,6 +253,18 @@ export default function Home() {
         </View>
       </View>
 
+
+
+      <Modal
+        transparent
+        visible={spiner}
+        animationType="fade"
+        // onRequestClose={() => toggleisPopupVisible(false)}
+      >
+        <View style={{flexDirection:'column',backgroundColor:'#ffffff50',justifyContent:'center',alignItems:'center',width:"100%",height:'100%'}}>
+          <ActivityIndicator size="large" />
+        </View>
+      </Modal>
 
       <Modal
         transparent

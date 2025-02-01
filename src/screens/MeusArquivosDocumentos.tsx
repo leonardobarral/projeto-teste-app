@@ -20,7 +20,7 @@ import txt from "../assets/images/txt.png";
 import ppt from "../assets/images/ppt.png";
 import heroicons_solid_download from "../assets/images/heroicons_solid_download.png";
 import mdi_share from "../assets/images/mdi_share.png";
-import { useUser } from "../context/Auth";
+import { fileDoc, useUser } from "../context/Auth";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -37,17 +37,9 @@ import {
 } from "../../services/managerfiles";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import doctypes from "../components/docTypes.json";
+import { NotFoundFile } from "../components/NotFoundFile";
 
-type fileDoc = {
-  id: string;
-  cidade: string;
-  data: string;
-  uid: string;
-  type: string;
-  url: string;
-  extencao: string;
-  nome: string;
-};
+
 
 export default function MeusArquivosDocumentos() {
   const navigation = useNavigation<AppStack>();
@@ -65,6 +57,8 @@ export default function MeusArquivosDocumentos() {
   const [selecting, setSelecting] = useState(false);
 
   const [textSelection, setTextSelection] = useState("Selecionar");
+
+  const [spiner, setSpiner] = useState(false);
 
   const toggleselecting = (value: SetStateAction<boolean>) => {
     // console.log(value)
@@ -120,12 +114,14 @@ export default function MeusArquivosDocumentos() {
 
   //lista de imagens
   const fetchImages = async () => {
+    setSpiner(true)
     try {
       const filesCollection = firestore().collection("files");
       const snapshot = await filesCollection
-        .where("uid", "==", user?.uid)
-        .where("type", "==", "documento")
-        .orderBy('data','desc')
+        .where('uid', '==',user?.uid)
+        .where('type','==','documento')
+        .where('status','==',true)
+        .orderBy('dataCadastro','desc')
         .get();
 
       if (!snapshot.empty) {
@@ -135,9 +131,12 @@ export default function MeusArquivosDocumentos() {
         }));
         // for (let i in fileData) console.log(i, "-", fileData[i].nome);
         setFiles(fileData);
+        setSpiner(false)
       }
+      setSpiner(false)
     } catch (error) {
       console.error("Erro ao buscar registros:", error);
+      setSpiner(false)
       return [];
     }
   };
@@ -151,7 +150,7 @@ export default function MeusArquivosDocumentos() {
 
   const hadleDowload = async () => {
     setloadVisible(true);
-    if (listAction.length > 0) await downloadFile(listAction);
+    if (listAction.length === 1) await downloadFile(listAction);
     setloadVisible(false);
   };
   const handleShareFile = async () => {
@@ -203,8 +202,9 @@ export default function MeusArquivosDocumentos() {
           >
             <Text style={styles.textSelection}>{textSelection}</Text>
           </TouchableOpacity>
-
           <View style={styles.containerList}>
+            {spiner?<ActivityIndicator size="large" />:
+            files.length == 0 ?<NotFoundFile value="Nenhuma imagem disponível!" />:
             <FlatList
               contentContainerStyle={styles.containerCards}
               data={files}
@@ -215,16 +215,16 @@ export default function MeusArquivosDocumentos() {
                   name={item.nome}
                   extecao={image(item.url)}
                   text1={item.nome}
-                  text2={item.cidade}
-                  text3={item.data}
-                  // text4 = {"1 item"}
+                  text2={item.cidade.charAt(0).toUpperCase() + item.cidade.slice(1).toLowerCase()+", "+item.uf.toUpperCase()}
+                  text3={item.dataCadastro.split(" ")[0]}
+                  text4 = {`criado em ${item.dataCriacao}`}
                   selecting={selecting}
                   longPress={() => toggleselecting(true)}
                   number={(it) => toggleNumber(it)}
                   action={(it) => toogleListAction(it[0], it[1], it[2])}
                 />
               )}
-            />
+            />}
             {/* <View style = {styles.containerCards}>
               <CardM4 
                 imagePath={Pdf}
@@ -258,10 +258,10 @@ export default function MeusArquivosDocumentos() {
                 onPress={() => handleShareFile()}
               />
             )}
-            <ButtonComponentCircleM2
+            {visibleButtonShare && (<ButtonComponentCircleM2
               imagePath={heroicons_solid_download}
               onPress={() => hadleDowload()}
-            />
+            />)}
           </View>
         )}
       </View>

@@ -1,11 +1,18 @@
 import React from "react";
-import { Alert, Linking, Platform} from "react-native";
+import { Alert, Linking, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import mime from 'mime';
+import * as IntentLauncher from 'expo-intent-launcher';
+
+// import * as IntentLauncherAndroid from 'expo-intent-launcher/IntentLauncher';
+
+
+// import * as Permissions from 'expo-permissions';
 
 
 
@@ -21,7 +28,7 @@ export const camera3x4 = async () => {
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
     allowsEditing: true,
     aspect: [3, 4],
-    quality: 1,
+    quality: 0.5,
   });
 
   if (!result.cancelled && result.assets[0].uri) {
@@ -31,8 +38,8 @@ export const camera3x4 = async () => {
       {
         compress: 0.2,
         format: ImageManipulator.SaveFormat.JPEG,
-        maxWidth: 400,
-        maxHeight: 400,
+        // maxWidth: 400,
+        // maxHeight: 400,
       } as any
     );
 
@@ -40,6 +47,8 @@ export const camera3x4 = async () => {
   }
   return;
 }
+
+
 export const camera = async () => {
   const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
@@ -58,6 +67,10 @@ export const camera = async () => {
   if (!result.cancelled && result.assets[0].uri) return result.assets[0].uri;
   return;
 }
+
+
+
+
 export const fileImage3x4 = async () => {
   const { status: mediaLibraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -73,7 +86,7 @@ export const fileImage3x4 = async () => {
   const result: any = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
     allowsEditing: true,
-    aspect: [1, 1],
+    aspect: [3, 4],
     quality: 0.5,
   });
   if (result.assets[0].uri) {
@@ -84,8 +97,8 @@ export const fileImage3x4 = async () => {
       {
         compress: 0.2,
         format: ImageManipulator.SaveFormat.JPEG,
-        maxWidth: 400,
-        maxHeight: 400,
+        // maxWidth: 400,
+        // maxHeight: 400,
       } as any
     );
 
@@ -113,12 +126,12 @@ export const fileImage = async () => {
     quality: 0.5,
   });
 
+  console.log(result.assets[0])
+
   if (result.assets[0].uri) return result.assets[0].uri;
 
   return;
 }
-
-
 export const file = async () => {
   try {
     const result = await DocumentPicker.getDocumentAsync({
@@ -152,7 +165,6 @@ export const file = async () => {
     return;
   }
 }
-
 export const downloadImage = async (urls:any) => {
   
    
@@ -173,7 +185,7 @@ export const downloadImage = async (urls:any) => {
       if(fileName) {
         const fileUri = FileSystem.documentDirectory + fileName;
         const response = await FileSystem.downloadAsync(url, fileUri);
-        console.log(response.uri)
+        // console.log(response.uri)
         
         try{
           const asset = await MediaLibrary.createAssetAsync(response.uri);
@@ -195,96 +207,314 @@ export const downloadImage = async (urls:any) => {
     await Promise.all(downloadPromises);
 
     // setInitializing(false)
-    Alert.alert('Sucesso', 'Dowload realizado!');
-  } catch (error) {
-    // setInitializing(false)
-    console.error('Erro ao fazer dowload:', error);
-    Alert.alert('Erro', 'Não foi possível salvar o arquivo.');
-  }
-};
-
-
-
-
-
-
-export const downloadFile = async (actions:[string,string][]) => {
-  try {
-    // Solicitar permissão para acesso à mídia
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Conceda acesso à biblioteca para salvar arquivos.');
-      return;
-    }
-
-    // Criar uma pasta no diretório de downloads
-    const downloadsFolder = `${FileSystem.documentDirectory}MeusDownloads/`;
-    const folderInfo = await FileSystem.getInfoAsync(downloadsFolder);
-
-    if (!folderInfo.exists) {
-      await FileSystem.makeDirectoryAsync(downloadsFolder, { intermediates: true });
-    }
-
-    // Baixar arquivos para a pasta criada
-    const downloadPromises = actions.map( async (item: [string,string]) => {
-      const decodedPath = decodeURIComponent(new URL(item[0]).pathname);
-      const fileName = item[1];
-      // Alert.alert('Sucesso', `Download realizado em: ${downloadsFolder}`);
-      if (fileName) {
-        // const fileUri = `${downloadsFolder}${fileName}`;
-        // const fileUri = `${downloadsFolder}${item[1]}`;
-        const fileUri = FileSystem.documentDirectory + fileName;
-        const response = await FileSystem.downloadAsync(item[0], fileUri);
-        console.log('Caminho: ',response.uri)
-      }
-    });
-    
-    console.log('Caminho original: ',downloadsFolder)
-    
-    await Promise.all(downloadPromises);
-
-    
-    // Alert.alert('Sucesso', 'Dowload realizado!');
     Alert.alert(
       'Sucesso',
-      'Download realizado! Deseja abrir a pasta?',
+      `Download realizado, deseja abrir o arquivo?`,
       [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Abrir Pasta',
-          onPress: () => openFolder(downloadsFolder),
-        },
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Abrir', onPress: () => OpenGalery() },
       ],
       { cancelable: true }
     );
   } catch (error) {
+    // setInitializing(false) 
     console.error('Erro ao fazer dowload:', error);
     Alert.alert('Erro', 'Não foi possível salvar o arquivo.');
   }
 };
 
-const openFolder = async (path: string) => {
-  const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Conceda acesso à biblioteca para salvar arquivos.');
-      return;
-    }
+// export const downloadImage = async (urls: any) => {
+//   try {
+//     const { status } = await MediaLibrary.requestPermissionsAsync();
+//     if (status !== 'granted') {
+//       Alert.alert('Permissão necessária', 'Conceda acesso à biblioteca para salvar arquivos.');
+//       return;
+//     }
+
+//     const assets = [];
+//     const downloadPromises = urls.map(async (url: string) => {
+//       const decodedPath = decodeURIComponent(new URL(url).pathname);
+//       const fileName = decodedPath.split('/').pop();
+ 
+//       if (fileName) {
+//         const fileUri = FileSystem.documentDirectory + fileName;
+//         const response = await FileSystem.downloadAsync(url, fileUri);
+
+//         try {
+//           const asset = await MediaLibrary.createAssetAsync(response.uri);
+//           assets.push(asset);
+//         } catch {
+//           console.log("Arquivo salvo, mas não é uma mídia compatível.");
+//         }
+//       }
+//     });
+
+//     if (assets.length > 0) {
+//       await MediaLibrary.createAlbumAsync('Download', assets[0], false);
+//       for (let i = 1; i < assets.length; i++) {
+//         await MediaLibrary.addAssetsToAlbumAsync([assets[i]], 'Download', false);
+//       }
+//     }
+
+//     await Promise.all(downloadPromises);
+
+//     Alert.alert(
+//       'Sucesso',
+//       `Download realizado, deseja abrir o arquivo?`,
+//       [
+//         { text: 'Cancelar', style: 'cancel' },
+//         { text: 'Abrir', onPress: () => OpenGallery() },
+//       ],
+//       { cancelable: true }
+//     );
+//   } catch (error) {
+//     console.error('Erro ao fazer download:', error);
+//     Alert.alert('Erro', 'Não foi possível salvar o arquivo.');
+//   }
+// };
+
+
+
+
+// const OpenGallery = async () => {
+//   try {
+//     if (Platform.OS === 'android') {
+//       // Abre a galeria de imagens no Android
+//       await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+//         data: 'content://media/internal/images/media',
+//         type: 'image/*',
+//       });
+//     } else if (Platform.OS === 'ios') {
+//       // Abre a galeria de fotos no iOS
+//       await Linking.openURL('photos-redirect://');
+//     } else {
+//       Alert.alert('Erro', 'Plataforma não suportada.');
+//     }
+//   } catch (error) {
+//     console.error('Erro ao abrir a galeria:', error);
+//     Alert.alert('Erro', 'Não foi possível abrir a galeria de fotos.');
+//   }
+// };
+
+
+
+// export const downloadFile = async (listAction) => {
+//   try {
+//     console.log("break - 1");
+//     // Request permissions to write to external storage
+//     const { status } = await MediaLibrary.requestPermissionsAsync();
+//     if (status !== 'granted') {
+//       alert('Permission to access media library is required!');
+//       return;
+//     }
+//     console.log("break - 2");
+
+//     for (const [url, name] of listAction) {
+//       console.log("break - 3");
+//       console.log("break - 3.2: ", url);
+//       let type = mime.getType(url);
+//       console.log("break - 3.1: ", type);
+
+//       // If mime type is null, try to extract extension from URL
+//       if (!type) {
+//         const extensionMatch = url.match(/\.([a-zA-Z0-9]+)(\?|$)/);
+//         const extension = extensionMatch ? extensionMatch[1] : '';
+//         type = mime.getType(extension);
+//         console.log("break - 3.3: Extracted extension type: ", type);
+//       }
+
+//       if (type) {
+//         console.log("break - 4");
+//         const validMimeTypes = [
+//           'application/pdf',
+//           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+//           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//           'text/plain',
+//           'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+//         ];
+        
+//         if (validMimeTypes.includes(type)) {
+//           console.log("break - 5");
+//           // Define path to the public storage directory
+//           const fileUri = `${FileSystem.documentDirectory}${name}`;
+          
+//           // Download the file to a local directory
+//           const downloadResult = await FileSystem.downloadAsync(url, fileUri);
+// console.log('Downloaded file to temporary location:', downloadResult.uri);
+//           if (downloadResult.status === 200) {
+//             console.log("break - 6");
+//             // Move file to Downloads directory
+//             const downloadsDirectory = `${FileSystem.documentDirectory}Download/`;
+//             const destinationUri = `${downloadsDirectory}${name}`;
+
+//             try {
+//               await FileSystem.makeDirectoryAsync(downloadsDirectory, { intermediates: true });
+//               await FileSystem.moveAsync({ from: downloadResult.uri, to: destinationUri });
+// console.log('Moved file to final destination:', destinationUri);
+//               console.log(`Downloaded ${name} to public Downloads successfully.`);
+//               Alert.alert(
+//                 'Sucesso',
+//                 `Download realizado com sucesso. Deseja abrir a pasta de Downloads?`,
+//                 [
+//                   { text: 'Cancelar', style: 'cancel' },
+//                   { text: 'Abrir', onPress: () => openFolder() },
+//                 ],
+//                 { cancelable: true }
+//               );
+//             } catch (error) {
+//               console.error('Error moving file to Downloads:', error);
+//               Alert.alert('Erro', 'Não foi possível mover o arquivo para a pasta de Downloads. Verifique as permissões.');
+//             }
+//           } else {
+//             console.error(`Failed to download file ${name}`);
+//           }
+//         } else {
+//           console.error(`File type not supported: ${name}`);
+//         }
+//       }
+//     }
+//   } catch (error) {
+//     console.error('Error downloading files:', error);
+//   }
+// };
+
+
+
+
+// const openFolder = async () => {
+//   try {
+//     console.log("openFolder - 1: Start open folder process");
+//     if (Platform.OS === 'android') {
+//       console.log("openFolder - 2: Platform is Android");
+//       console.log("openFolder - 3: Preparing to launch ACTION_OPEN_DOCUMENT_TREE to open Downloads");
+//       await IntentLauncher.startActivityAsync('android.intent.action.OPEN_DOCUMENT_TREE', {
+//         flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+//       });
+//       console.log("openFolder - 4: Intent launched successfully");
+//     } else {
+//       console.log("openFolder - 5: Platform is not Android, showing alert");
+//       Alert.alert('Erro', 'Abrir a pasta não é suportado nesta plataforma.');
+//     }
+//   } catch (error) {
+//     console.log('openFolder - 6: Error occurred while trying to open the folder', error);
+//     console.error('Erro ao abrir a pasta:', error);
+//     Alert.alert('Erro', 'Não foi possível abrir a pasta de Downloads.');
+//   }
+// };
+
+declare module 'mime';
+
+const shareFiles = async (fileUri:string) => {
   try {
-    if (Platform.OS === 'android') {
-      // Usar Linking para abrir o gerenciador de arquivos
-      // const folderUri = FileSystem.documentDirectory + 'MeusDownloads/'; // Substituir por path público, se necessário
-      await Linking.openURL(path);
-    } else {
-      Alert.alert('Erro', 'Abrir pasta não é suportado nesta plataforma.');
+    console.log("shareFile - Iniciando compartilhamento");
+    const local = mime.getType(fileUri)
+    if(local){
+      await Sharing.shareAsync(fileUri, {
+        dialogTitle: 'Escolha onde salvar o arquivo',
+        mimeType: local
+      });
     }
+    console.log("shareFile - Arquivo salvo com sucesso:", fileUri);
   } catch (error) {
-    console.error('Erro ao abrir pasta:', error);
-    Alert.alert('Erro', 'Não foi possível abrir a pasta.');
+    console.error('Erro ao compartilhar o arquivo:', error);
+    Alert.alert('Erro', 'Não foi possível compartilhar o arquivo.');
   }
 };
+
+export const downloadFile = async (listAction:any) => {
+  try {
+    console.log("downloadFiles - Iniciando download de arquivos");
+
+    for (const [url, name] of listAction) {
+      console.log("downloadFiles - Baixando:", name);
+      let type = mime.getType(url);
+
+      // Tentativa de extrair a extensão do URL caso o tipo MIME não seja identificado
+      if (!type) {
+        const extensionMatch = url.match(/\.([a-zA-Z0-9]+)(\?|$)/);
+        const extension = extensionMatch ? extensionMatch[1] : '';
+        type = mime.getType(extension);
+        console.log("downloadFiles - Tipo extraído:", type);
+      }
+
+      // Verifica se o tipo MIME é suportado
+      if (type) {
+        const validMimeTypes = [
+          'application/pdf',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'text/plain',
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        ];
+
+        if (validMimeTypes.includes(type)) {
+          console.log("downloadFiles - Tipo válido, iniciando download...");
+
+          // Definir caminho para o diretório de cache
+          const fileUri = `${FileSystem.cacheDirectory}${name}`;
+
+          // Baixar o arquivo para o diretório de cache
+          const downloadResult = await FileSystem.downloadAsync(url, fileUri);
+          console.log('Arquivo baixado para o cache:', downloadResult.uri);
+
+          if (downloadResult.status === 200) {
+            // Compartilhar o arquivo baixado
+            await shareFiles(downloadResult.uri);
+          } else {
+            console.error(`Falha ao baixar o arquivo ${name}`);
+          }
+        } else {
+          console.error(`Tipo de arquivo não suportado: ${name}`);
+        }
+      }
+    }
+
+    Alert.alert('Sucesso', 'Todos os arquivos foram baixados e salvos com sucesso.');
+  } catch (error) {
+    console.error('Erro ao baixar ou salvar arquivos:', error);
+    Alert.alert('Erro', 'Não foi possível baixar ou salvar todos os arquivos.');
+  }
+};
+
+
+
+
+
+// async () => {
+//   try {
+//     if (Platform.OS === 'android') {
+//       // Usa Intent Android para abrir a pasta de Downloads diretamente
+//       await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+//         data: 'content://com.android.externalstorage.documents/document/primary:Download',
+//         flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+//       });
+//     } else {
+//       Alert.alert('Erro', 'Abrir a pasta não é suportado nesta plataforma.');
+//     }
+//   } catch (error) {
+//     console.log('Erro ao abrir a pasta:', error);
+//     console.error('Erro ao abrir a pasta:', error);
+//     Alert.alert('Erro', 'Não foi possível abrir a pasta de Downloads.');
+//   }
+// };
+
+const OpenGalery = async () => {
+  try {
+    if (Platform.OS === 'android') {
+      // Usa Intent Android para abrir a galeria de fotos diretamente
+      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+        data: 'content://media/internal/images/media',
+      });
+    } else {
+      Alert.alert('Erro', 'Abrir a galeria não é suportado nesta plataforma.');
+    }
+  } catch (error) {
+    console.log('Erro ao abrir a galeria:', error);
+    console.error('Erro ao abrir a galeria:', error);
+    Alert.alert('Erro', 'Não foi possível abrir a galeria.');
+  }
+};
+
 
 export const downloadFileTemporarioFile = async (item: any) => {
   try {
@@ -318,10 +548,9 @@ export const shareFile = async (uri: string) => {
         console.log('Compartilhamento não disponível', 'Seu dispositivo não suporta compartilhamento.');
         return;
       }
-  
       // Compartilha o arquivo
       await Sharing.shareAsync(uri);
-      console.log(`Arquivo compartilhado: ${uri}`);
+      // console.log(`Arquivo compartilhado: ${uri}`);
     } catch (error) {
       console.error('Erro ao compartilhar arquivo:', error);
       Alert.alert('Erro', 'Não foi possível compartilhar o arquivo.');

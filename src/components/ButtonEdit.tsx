@@ -27,15 +27,15 @@ export const ButtonEdit = ({editable,press}:Props) => {
     <TouchableOpacity style={styles.button} onPress={()=> {
       hadlebuton(editable)
     }}>
-      <Icon name={image} style={styles.icon} size = {24}  color="white" />
+      <Icon name={image} style={styles.icon} size = {40}  color="white" />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   icon: {
-    width: 24,
-    height : 24
+    width: 40,
+    height : 40
   },
   button:{
 

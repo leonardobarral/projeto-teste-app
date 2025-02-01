@@ -59,14 +59,15 @@ const styles = StyleSheet.create({
     width : '100%',
     height : 68,
     paddingVertical : 14,
-    paddingHorizontal : 24
+    // paddingLeft : 8,
+    paddingRight : 18,
   },
   title:{
     // fontFamily : 'Poppins-Regular',
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 24,
+    fontSize: 28,
+    fontWeight: '400',
+    lineHeight: 35,
     textAlign: 'center',
     alignContent:'center',
     flex : 1

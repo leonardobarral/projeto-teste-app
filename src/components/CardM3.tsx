@@ -6,11 +6,12 @@ type Props = {
   text1: string;
   text2: string;
   text3: string;
-  // text4: string;
+  text4: string|null;
   selecting: boolean;
   longPress?: () => void;
   number?: (value: number) => void;
   action?: (it:[string,string]) => void;
+  view?: (it:string) => void;
 };
 
 
@@ -20,11 +21,12 @@ export const CardM3 = ({
   text1,
   text2,
   text3,
-  // text4,
+  text4,
   selecting,
   longPress,
   number,
-  action
+  action,
+  view,
 }:Props) => {
   
   const [status, setStatus] = useState(false);
@@ -36,6 +38,9 @@ export const CardM3 = ({
     if(!value &&  action){
       action([imagePath,'remove'])
     }
+  };
+  const toggleView = () => {
+    if(imagePath && view) view(imagePath)
   };
   // const toggleStatus = (value: boolean) => {
   //   setStatus(value);
@@ -58,6 +63,10 @@ export const CardM3 = ({
       if(selecting){
         if(status) toggleStatus(false)
         else(toggleStatus(true))
+        
+      }
+      else{
+        toggleView()
       }
     }}
     
@@ -83,6 +92,7 @@ export const CardM3 = ({
           <Text style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{text1}</Text>
           <Text style={styles.text2}>{text2}</Text>
           <Text style={styles.text3}>{text3}</Text>
+          {text4 ?<Text style={styles.text3}>{text4}</Text>:null}
         </View>
       </View>
     </TouchableOpacity>

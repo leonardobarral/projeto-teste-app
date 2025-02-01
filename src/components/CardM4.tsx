@@ -8,7 +8,7 @@ type Props = {
   text1: string;
   text2: string;
   text3: string;
-  // text4: string;
+  text4: string|null;
   selecting: boolean;
   longPress?: () => void;
   number?: (value: number) => void;
@@ -24,7 +24,7 @@ export const CardM4 = ({
   text1,
   text2,
   text3,
-  // text4,
+  text4,
   selecting,
   longPress,
   number,
@@ -86,17 +86,15 @@ export const CardM4 = ({
     }}
     >
       <View style={styles.container}>
-        
-        
         <Image
           source={extecao}
           style={styles.image}
         />
         <View style = {styles.containerText}>
+          <Text style={styles.text1}>{`Enviado em ${text3}`}</Text>
           <Text style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{name}</Text>
           <Text style={styles.text2}>{text2}</Text>
-          <Text style={styles.text3}>{`Enviado em ${text3}`}</Text>
-          {/* <Text style={styles.text3}>{text4}</Text> */}
+          <Text style={styles.text3}>{text4}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -125,7 +123,7 @@ const styles = StyleSheet.create({
 
   container : {
     width : '100%',
-    height : 90,
+    minHeight : 90,
     flexDirection : 'row',
     columnGap :16,
     alignItems: 'center',

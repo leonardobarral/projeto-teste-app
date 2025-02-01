@@ -80,13 +80,18 @@ const styles = StyleSheet.create({
     alignItems : 'center',
     justifyContent : 'space-between',
     height : 42,
-    paddingHorizontal : 24,
+    paddingLeft : 8,
+    paddingRight : 18,
     // backgroundColor:"#000000"
 
   },
   button:{
-    width : 24,
-    height : 24
+    width :60,
+    height : 60,
+    // backgroundColor:"#df0000",
+    // alignContent:"center"
+    justifyContent:'center',
+    alignItems:'center'
   },
   containerPersonal:{
     top : 26,

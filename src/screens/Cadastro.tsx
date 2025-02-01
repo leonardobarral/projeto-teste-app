@@ -34,6 +34,16 @@ export default function Cadastro() {
     const [focusPassword,setFocusPassword]=useState(false)
     const [focusConfirmPassword,setFocusCPassword]=useState(false)
 
+    const getEmailFromCPF = async (cpf: string) => {
+        const ncpf = sanitizeInput(cpf)
+        const usersRef = firestore().collection("usuario");
+        const querySnapshot = await usersRef.where("cpf", "==", ncpf).get();
+        if (querySnapshot.empty) {
+          return true;
+        }
+        return false;
+      };
+
     const handlefocus=()=>{
         setFocusNome(false)
         setFocusCpf(false)
@@ -59,61 +69,80 @@ export default function Cadastro() {
     };
     //busca por e-mail a partir de um cpf
     const cpfUtilizado = async (cpf: string) => {
+
         const ncpf = sanitizeInputCpf(cpf)
         const usersRef = firestore().collection("usuario");
         const querySnapshot = await usersRef.where("cpf", "==", ncpf).get();
+        const user = auth().currentUser;
+
         if (querySnapshot.empty) {
         return false;
         }
         return true;
     };
 
+    const validarSenha = (password: string): boolean => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+        return regex.test(password);
+    };
+
     const validarCampos = async () => {
-        if (!nome.trim()) {
-          Alert.alert("Erro", "O campo Nome é obrigatório.");
-          setFocusNome(true)
-          return false;
+        try{
+
+            if (!nome.trim()) {
+              Alert.alert("Erro", "O campo Nome é obrigatório.");
+              setFocusNome(true)
+              return false;
+            }
+            if (!cpf.trim() || !validarCPF(cpf)) {
+              Alert.alert("Erro", "CPF inválido ou não informado.");
+              setFocusCpf(true)
+              return false;
+            }
+            if (await cpfUtilizado(cpf)) {
+              Alert.alert("Erro", "CPF já utilizado em uma conta existente");
+              setFocusCpf(true)
+              return false;
+            }
+            if (!email.trim() || !validarEmail(email)) {
+              Alert.alert("Erro", "E-mail inválido ou não informado.");
+              setFocusEmail(true)
+              return false;
+            }
+            if (!telefone.trim()) {
+              Alert.alert("Erro", "O campo Telefone é obrigatório.");
+              setFocusTelefone(true)
+              return false;
+            }
+            if (!password.trim() || !validarSenha(password) ) {
+              Alert.alert("Erro", "A senha deve ter pelo menos: 8 caracteres, 1 caracter especial ($#@ etc.), 1 letra maiúscula, 1 letra minúscula e um número."); 
+              setFocusPassword(true)
+              return false;
+            }
+            if (password !== confirmPassword) {
+              Alert.alert("Erro", "As senhas não conferem.");
+              setFocusCPassword(true)
+              return false;
+            }
+            return true; 
+        }catch(error){
+            console.log(error)
         }
-        if (!cpf.trim() || !validarCPF(cpf)) {
-          Alert.alert("Erro", "CPF inválido ou não informado.");
-          setFocusCpf(true)
-          return false;
-        }
-        // if (await cpfUtilizado(cpf)) {
-        //   Alert.alert("Erro", "CPF já utilizado em uma conta existente");
-        //   setFocusCpf(true)
-        //   return false;
-        // }
-        if (!email.trim() || !validarEmail(email)) {
-          Alert.alert("Erro", "E-mail inválido ou não informado.");
-          setFocusEmail(true)
-          return false;
-        }
-        if (!telefone.trim()) {
-          Alert.alert("Erro", "O campo Telefone é obrigatório.");
-          setFocusTelefone(true)
-          return false;
-        }
-        if (!password.trim() || password.length < 6) {
-          Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres.");
-          setFocusPassword(true)
-          return false;
-        }
-        if (password !== confirmPassword) {
-          Alert.alert("Erro", "As senhas não conferem.");
-          setFocusCPassword(true)
-          return false;
-        }
-        return true; 
       };
 
 
-
+ 
     const handleCadastro = async () =>{
         try{
+
             if(await validarCampos()){
 
+
+
+
                 const userCredential = await signUp(email,password);  
+
+                
                 if(userCredential){
                     
                     const currentDate = new Date();
@@ -135,14 +164,15 @@ export default function Cadastro() {
                     await userCollectionRef.doc(userCredential.uid).set(userObjeto);
                     await auth().currentUser?.sendEmailVerification()
 
+                    
+                    await auth().signOut()
+                    
+                    navigation.navigate('Login')
                     Alert.alert(
                         "Conta Cadastrado com sucesso!",
                         "Foi enviado uma mensagem de confirmação de cadastro para o e-mail cadastrado!"
                     );
                 
-                }else{
-                    Alert.alert("Erro de cadastro, tente novemente.");
-                    
                 }
             }
         }catch(error){

@@ -1,4 +1,4 @@
-import { StyleSheet,  View, TouchableOpacity, Text, Modal, FlatList ,KeyboardAvoidingView, Platform, Dimensions, ActivityIndicator,} from 'react-native';
+import { StyleSheet,  View, TouchableOpacity, Text, Modal, FlatList ,KeyboardAvoidingView, Platform, Dimensions, ActivityIndicator, Image,} from 'react-native';
 import { HeaderM2 } from '../components/HeaderM2';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CardM3 } from '../components/CardM3';
@@ -13,22 +13,14 @@ import {  SafeAreaView} from 'react-native';
 import {useNavigation} from '@react-navigation/native'
 import { AppStack } from '../routes/AppStack'
 import { Bar } from '../components/Bar';
-import { useUser } from '../context/Auth';
+import { fileDoc, useUser } from '../context/Auth';
 import storage from "@react-native-firebase/storage"
 import firestore from "@react-native-firebase/firestore"
 import { downloadFile, downloadFileTemporarioFile, downloadImage, shareFile } from "../../services/managerfiles"
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { NotFoundFile } from '../components/NotFoundFile';
 
-type fileDoc = {
-  id:string,
-  cidade : string,
-  data : string,
-  uid: string,
-  type: string,
-  url:string,
-  extencao:string,
-  name:string,
-}
+
 
 export default function MeusArquivosImagens() {
   const navigation = useNavigation<AppStack>();
@@ -38,6 +30,9 @@ export default function MeusArquivosImagens() {
   // const [visibleBar, setvisibleBar] = useState(false);
   const [visibleButtonShare, setVisibleButtonShare] = useState(false);
   const [loadVisible, setloadVisible] = useState(false);
+
+  const [showImagemGreat, setShowImagemGreat] = useState(false); 
+  const [showImagemItem, setShowImagemItem] = useState("");
   
   const toggleVisibleBar = () => {
     setVisibleBar(!visibleBar);
@@ -45,6 +40,7 @@ export default function MeusArquivosImagens() {
 
 
   const [selecting, setSelecting] = useState(false);
+  const [spiner, setSpiner] = useState(false);
 
   const [textSelection, setTextSelection] = useState("Selecionar");
 
@@ -101,22 +97,31 @@ export default function MeusArquivosImagens() {
   
   //lista de imagens
   const fetchImages = async () => {
+    setSpiner(true)
     try {
 
 
       const filesCollection  = firestore().collection('files')
-      const snapshot = await filesCollection.where('uid', '==',user?.uid).where('type','==','imagem').orderBy('data','desc').get();
+      const snapshot = await filesCollection
+      .where('uid', '==',user?.uid)
+      .where('type','==','imagem')
+      .where('status','==',true)
+      .orderBy('dataCadastro','desc')
+      .get();
 
       if (!snapshot.empty) {
         const fileData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...(doc.data() as Omit<fileDoc, 'id'>),
         }));
-        // for (let i in fileData) console.log(i,"-",fileData[i])
+        for (let i in fileData) console.log(i,"-",fileData[i])
         setFiles(fileData);
+        setSpiner(false)
       }
+      setSpiner(false)
     }catch(error){
       console.error('Erro ao buscar registros:', error);
+      setSpiner(false)
       return [];
     }
   }
@@ -142,6 +147,10 @@ export default function MeusArquivosImagens() {
     } 
   }
 
+  useEffect(()=>{
+    if(showImagemItem) setShowImagemGreat(true)
+  },[showImagemItem])
+
   return (
     <LinearGradient colors={["#F7FAFC","#8BC4FD"]} style = {styles.container}>
       
@@ -163,6 +172,8 @@ export default function MeusArquivosImagens() {
           </TouchableOpacity>
 
           <View style = {styles.containerList}>
+            {spiner?<ActivityIndicator size="large" />: 
+            files.length == 0 ?<NotFoundFile value="Nenhuma imagem disponível!" />:
             <FlatList 
               contentContainerStyle ={styles.containerCards}
               data = {files}
@@ -170,41 +181,19 @@ export default function MeusArquivosImagens() {
               renderItem={({item})=>(
                 <CardM3 
                   imagePath={item.url} 
-                  text1 = {`Enviado em ${item.data}`}
-                  text2 = {item.cidade}
-                  text3 = {"2 de novembro de 2029"}
-                  // text4 = {"1 item"}
+                  text1 = {`Enviado em ${item.dataCadastro.split(" ")[0]}`}
+                  text2 = {`${item.cidade.charAt(0).toUpperCase() + item.cidade.slice(1).toLowerCase()}, ${item.uf.toLocaleUpperCase()}`}
+                  text3 = {`criado em ${item.dataCriacao}`}
+                  text4 = {item.geolocalizacao.latitude && item.geolocalizacao.longitute?`${item.geolocalizacao.latitude}S ${item.geolocalizacao.longitute}E`:null}
                   selecting = {selecting}
                   longPress={() => toggleselecting(true)}
                   number={(it) => toggleNumber(it)}
+                  view={(it) => setShowImagemItem(it)}
                   action={(it) => toogleListAction(it[0],it[1])}
                 />
 
               )}
-            />
-            {/* <View style = {styles.containerCards}>
-              <CardM3 
-                imagePath={img2}
-                text1 = {"Enviado em 3 de junho de 2029"}
-                text2 = {"São Francisco, CA"}
-                text3 = {"3 de novembro de 2029"}
-                // text4 = {"1 item"}
-                selecting = {selecting}
-                longPress={() => toggleselecting(true)}
-                number={(it) => toggleNumber(it)}
-              />
-              <CardM3 
-                imagePath={img2}
-                text1 = {"Enviado em 3 de junho de 2029"}
-                text2 = {"São Francisco, CA"}
-                text3 = {"3 de novembro de 2029"}
-                // text4 = {"1 item"}
-                selecting = {selecting}
-                longPress={() => toggleselecting(true)}
-                number={(it) => toggleNumber(it)}
-              /> 
-            </View> */}
-
+            />}
           </View>
           {/* <View style={{height:bottomPadding}}></View> */}
         </View>
@@ -214,8 +203,27 @@ export default function MeusArquivosImagens() {
           <ButtonComponentCircleM2 imagePath={heroicons_solid_download} onPress={()=>hadleDowload()}/>
         </View>)}
       </View>
-      {/* <Load visible={loadVisible} /> */}
 
+      <Modal
+        transparent
+        visible={showImagemGreat}
+        animationType="fade"
+        onRequestClose={() => {setShowImagemGreat(false),setShowImagemItem("")}}
+      >
+        <TouchableOpacity
+          style={styles.modal2}
+          activeOpacity={0.4}      
+          onPressOut={() => {setShowImagemGreat(false),setShowImagemItem("")}}
+        >
+          <View style = {{flex:1,justifyContent : 'center',alignItems:'center'}}>
+            <Image 
+              source={{uri: `${showImagemItem}` }}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
       <Modal
         transparent
         visible={loadVisible}
@@ -247,6 +255,10 @@ const styles = StyleSheet.create({
     height : '100%',
     justifyContent : 'flex-start',  
     paddingBottom:10,  
+  },
+  image:{
+    height : "100%",
+    width : "100%",
   },
 
   header:{

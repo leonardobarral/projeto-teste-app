@@ -16,7 +16,7 @@ export const ButtonShowbar = ({press}:Props) => {
             press()
           }
         }}>
-        <Icon name="menu" style={styles.icon} size = {24} color="white" />
+        <Icon name="menu" style={styles.icon} size = {50} color="white" />
       </TouchableOpacity> 
       
 
@@ -25,8 +25,8 @@ export const ButtonShowbar = ({press}:Props) => {
 
 const styles = StyleSheet.create({
   icon: {
-    width: 24,
-    height : 24
+    width: 50,
+    height : 50
   },
 });
 
