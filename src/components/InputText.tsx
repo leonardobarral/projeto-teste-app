@@ -3,6 +3,7 @@ import {  StyleSheet, TextInput, View } from 'react-native';
 
 
 type Props = {
+  value:any;
   placeHolder: any;
   keyboardType: any;
   onChangeText?: (it:string) => void;
@@ -14,17 +15,18 @@ type Props = {
 
 export const InputText = (
   {
+    value,
     placeHolder,
     keyboardType,
     onChangeText,
     focus,
     steFocus
   }:Props) => {
-  const [text, setText] = useState('');
+  // const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   
   const toggletext = (it:string)=>{
-    setText(it)
+    
     if(onChangeText) onChangeText(it)
     // if(steFocus) steFocus()
   }
@@ -43,7 +45,7 @@ export const InputText = (
         // focusable={focus}
         ref={inputRef} 
         placeholder= {placeHolder}
-        value = {text}
+        value = {value}
         onChangeText={toggletext}
         keyboardType={keyboardType}
         placeholderTextColor='#a17d1c8d'

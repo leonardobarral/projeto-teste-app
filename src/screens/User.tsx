@@ -25,7 +25,7 @@ export default function Login() {
   const [spiner, setSpiner] = useState(false);
   const{signOut,modifyPassword,user,usuario} = useUser();
   
-  const [imagem, setImagem] = useState(usuario.imagem);
+  const [imagem, setImagem] = useState(usuario.imagem||null);
 
   useEffect(()=>{
     setImagem(usuario.imagem)

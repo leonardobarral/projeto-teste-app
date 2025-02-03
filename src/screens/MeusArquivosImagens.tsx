@@ -106,7 +106,7 @@ export default function MeusArquivosImagens() {
       .where('uid', '==',user?.uid)
       .where('type','==','imagem')
       .where('status','==',true)
-      .orderBy('dataCadastro','desc')
+      .orderBy('dataCadastro','asc')
       .get();
 
       if (!snapshot.empty) {

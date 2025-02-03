@@ -9,15 +9,17 @@ import auth from "@react-native-firebase/auth"
 import firestore from "@react-native-firebase/firestore"
 import {useNavigation} from '@react-navigation/native'
 import {AuthStack} from '../routes/AuthStack'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {validarCPF,validarEmail} from '../context/Validador'
 import {useUser} from '../context/Auth'
+import { InputPassword } from '../components/InputPassword';
 
 
 
 
 export default function Cadastro() {
     const{signUp} = useUser();
+    const{setAction} = useUser();
     const navigation = useNavigation<AuthStack>();
 
     const [nome, setNome] = useState("");
@@ -34,7 +36,33 @@ export default function Cadastro() {
     const [focusPassword,setFocusPassword]=useState(false)
     const [focusConfirmPassword,setFocusCPassword]=useState(false)
 
+
+    const formatCPF = (value: string) => {
+        const onlyNumbers = value.replace(/\D/g, ""); // Remove tudo que não for número
+        return onlyNumbers
+            .replace(/^(\d{3})(\d)/, "$1.$2")
+            .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+            .replace(/\.(\d{3})(\d)/, ".$1-$2")
+            .slice(0, 14); // Limita para 14 caracteres (CPF formatado)
+    };
+
+    const formatPhone = (value: string) => {
+        const onlyNumbers = value.replace(/\D/g, ""); // Remove tudo que não for número
+        if (onlyNumbers.length > 10) {
+            return onlyNumbers
+                .replace(/^(\d{2})(\d{5})(\d)/, "($1) $2-$3")
+                .slice(0, 15); // Limita para 15 caracteres (telefone com 9 dígitos)
+        } else {
+            return onlyNumbers
+                .replace(/^(\d{2})(\d{4})(\d)/, "($1) $2-$3")
+                .slice(0, 14); // Limita para 14 caracteres (telefone com 8 dígitos)
+        }
+    };
+
+
     const getEmailFromCPF = async (cpf: string) => {
+
+        useEffect(()=>{setAction("cadastro")},[])
         const ncpf = sanitizeInput(cpf)
         const usersRef = firestore().collection("usuario");
         const querySnapshot = await usersRef.where("cpf", "==", ncpf).get();
@@ -69,16 +97,37 @@ export default function Cadastro() {
     };
     //busca por e-mail a partir de um cpf
     const cpfUtilizado = async (cpf: string) => {
-
-        const ncpf = sanitizeInputCpf(cpf)
-        const usersRef = firestore().collection("usuario");
-        const querySnapshot = await usersRef.where("cpf", "==", ncpf).get();
-        const user = auth().currentUser;
-
-        if (querySnapshot.empty) {
-        return false;
+        try{
+            const ncpf = sanitizeInputCpf(cpf)
+            const usersRef = firestore().collection("cpf_publico");
+            const querySnapshot = await usersRef.where("cpf", "==", ncpf).get();
+    
+            if (querySnapshot.empty) {
+                return false;
+            }
+            return true;
+        }catch(error){
+            Alert.alert("Erro de Cadastro","Existe algum erro relacionado ao CPF inserido, contate o suporte do aplicativo!")
+            return true
         }
-        return true;
+    };
+    const emailUtilizado = async (email: string) => {
+        try{
+            const nemail = sanitizeInput(email)
+            const usersRef = firestore().collection("email_publico");
+            const querySnapshot = await usersRef.where("email", "==", nemail).get();
+
+            console.log(nemail)
+            console.log(querySnapshot.docs)
+    
+            if (querySnapshot.empty) {
+                return false;
+            }
+            return true;
+        }catch(error){
+            Alert.alert("Erro de Cadastro","Existe algum erro relacionado ao E-mail inserido, contate o suporte do aplicativo!")
+            return true
+        }
     };
 
     const validarSenha = (password: string): boolean => {
@@ -94,19 +143,24 @@ export default function Cadastro() {
               setFocusNome(true)
               return false;
             }
-            if (!cpf.trim() || !validarCPF(cpf)) {
+            if (!cpf.trim() || !validarCPF(cpf.replace(/\D/g, ""))) {
               Alert.alert("Erro", "CPF inválido ou não informado.");
               setFocusCpf(true)
               return false;
             }
-            if (await cpfUtilizado(cpf)) {
+            if (await cpfUtilizado(cpf.replace(/\D/g, ""))) {
               Alert.alert("Erro", "CPF já utilizado em uma conta existente");
               setFocusCpf(true)
               return false;
             }
             if (!email.trim() || !validarEmail(email)) {
-              Alert.alert("Erro", "E-mail inválido ou não informado.");
-              setFocusEmail(true)
+                Alert.alert("Erro", "E-mail inválido ou não informado.");
+                setFocusEmail(true)
+                return false;
+            }
+            if (await emailUtilizado(email)) {
+              Alert.alert("Erro", "E-mail já utilizado em uma conta existente");
+              setFocusCpf(true)
               return false;
             }
             if (!telefone.trim()) {
@@ -146,30 +200,34 @@ export default function Cadastro() {
                 if(userCredential){
                     
                     const currentDate = new Date();
-                    
+                    const currentUserId = userCredential.uid
                     
                     const formattedDate = new Intl.DateTimeFormat('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(currentDate);
                     
                     const userObjeto ={
-                        uid: userCredential.uid,
+                        uid: currentUserId,
                         nome:nome.trim(),
-                        cpf:sanitizeInput(cpf),
+                        cpf:sanitizeInput(cpf.replace(/\D/g, "")),
                         email:sanitizeInput(email),
-                        telefone:sanitizeInput(telefone.trim()),
+                        telefone:sanitizeInput(telefone.replace(/\D/g, "").trim()),
                         dataCadastro: formattedDate.trim(),
                         imagem:''
                     }
     
                     const userCollectionRef = firestore().collection("usuario");
-                    await userCollectionRef.doc(userCredential.uid).set(userObjeto);
-                    await auth().currentUser?.sendEmailVerification()
+                    await userCollectionRef.doc(currentUserId).set(userObjeto);
 
+
+                    const cpfPublicoCollectionRef = firestore().collection("cpf_publico")
+                    await cpfPublicoCollectionRef.doc(currentUserId).set({cpf:userObjeto.cpf});
+                    const emailPublicoCollectionRef = firestore().collection("email_publico")
+                    await emailPublicoCollectionRef.doc(currentUserId).set({email:userObjeto.email});
                     
                     await auth().signOut()
                     
                     navigation.navigate('Login')
                     Alert.alert(
-                        "Conta Cadastrado com sucesso!",
+                        "Conta cadastrada com sucesso!",
                         "Foi enviado uma mensagem de confirmação de cadastro para o e-mail cadastrado!"
                     );
                 
@@ -197,22 +255,28 @@ export default function Cadastro() {
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={true} style = {styles.body}>
 
                 <View style = {styles.containerInputs}>
-                    <InputText placeHolder={"Nome"} focus = {focusNome} steFocus={()=>{handlefocus()}} keyboardType={"default"}  onChangeText={(it:string)=>setNome(it)}/>
+                    <InputText placeHolder={"Nome"} value = {nome} focus = {focusNome} steFocus={()=>{handlefocus()}} keyboardType={"default"}  onChangeText={(it:string)=>setNome(it)}/>
                 </View>
                 <View style = {styles.containerInputs}>
-                    <InputText placeHolder={"CPF"} focus = {focusCpf} steFocus={()=>{handlefocus()}} keyboardType={"number-pad"} onChangeText={(it:string)=>setCPF(it)}/>
+                    <InputText placeHolder={"CPF"} value={cpf} focus = {focusCpf} steFocus={()=>{handlefocus()}} keyboardType={"number-pad"} onChangeText={(it:string)=>setCPF(formatCPF(it))}/>
                 </View>
                 <View style = {styles.containerInputs}>
-                    <InputText placeHolder={"E-mail"} focus = {focusEmail} steFocus={()=>{handlefocus()}} keyboardType={"email-address"} onChangeText={(it:string)=>setEmail(it)}/>
+                    <InputText placeHolder={"E-mail"} value={email} focus = {focusEmail} steFocus={()=>{handlefocus()}} keyboardType={"email-address"} onChangeText={(it:string)=>setEmail(it)}/>
                 </View>
                 <View style = {styles.containerInputs}>
-                    <InputText placeHolder={"Telefone"} focus = {focusTelefone} steFocus={()=>{handlefocus()}} keyboardType={"phone-pad"} onChangeText={(it:string)=>setTelefone(it)}/>
+                    <InputText placeHolder={"Telefone"} value={telefone} focus = {focusTelefone} steFocus={()=>{handlefocus()}} keyboardType={"phone-pad"} onChangeText={(it:string)=>setTelefone(formatPhone(it))}/>
                 </View>
                 <View style = {styles.containerInputs}>
-                    <InputText placeHolder={"Senha"} focus = {focusPassword} steFocus={()=>{handlefocus()}} keyboardType={"default"} onChangeText={(it:string)=>setPassword(it)}/>
+                    <InputPassword 
+                    placeHolder={"Senha"} 
+                    focus = {focusPassword} 
+                    steFocus={()=>{handlefocus()}} 
+                    keyboardType={"default"} 
+                    onChangeText={(it:string)=>setPassword(it)}
+                    />
                 </View>
                 <View style = {styles.containerInputs}>
-                    <InputText placeHolder={"Confirmar Senha"} focus = {focusConfirmPassword} steFocus={()=>{handlefocus()}} keyboardType={"default"} onChangeText={(it:string)=>setConfirmPassword(it)}/>
+                    <InputPassword placeHolder={"Confirmar Senha"} focus = {focusConfirmPassword} steFocus={()=>{handlefocus()}} keyboardType={"default"} onChangeText={(it:string)=>setConfirmPassword(it)}/>
                 </View>                            
             </ScrollView>
 

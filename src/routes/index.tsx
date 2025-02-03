@@ -9,7 +9,7 @@ import { useUser } from '../context/Auth';
 
 export function Router(){
 
-  const{user,initializing} = useUser();
+  const{user,initializing,action,loged} = useUser();
 
   if(initializing){
   return(
@@ -21,7 +21,7 @@ export function Router(){
 
  return(
   <NavigationContainer>  
-    {user ? <AppStack/> : <AuthStack/>}
+    {user&&action=="login"&&loged? <AppStack/> : <AuthStack/>}
   </NavigationContainer>
  );
 }

@@ -31,6 +31,10 @@ interface AuthContexDate{
  signIn:(email:string,password : string) => Promise<void>;
  signOut:() => Promise<void>;
  modifyPassword:(email:string) => Promise<void>;
+ action:string,
+ loged:boolean,
+ setAction:React.Dispatch<React.SetStateAction<string>>,
+ setLoged:React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 export const AuthContex = createContext<AuthContexDate>(
@@ -48,60 +52,77 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
   const [usuario, setUsuario] = useState<UsuarioType>({} as UsuarioType);
   const [initializing , setInitializing] = useState(true);
   const [visibleBar , setVisibleBar] = useState(false);
+  const [action , setAction] = useState('');
+  const [loged , setLoged] = useState(false);
   
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async(_user)=>{
-      try{
-        setUser(_user)
-        if(_user && auth().currentUser){
-          try{
+    console.log("v1 - ",action)
+    if(action == "cadastro") return;
+    else if(action=='login'){
+      const unsubscribe = auth().onAuthStateChanged(async(_user)=>{
+        try{
+          setUser(_user)
+          if(_user && auth().currentUser){
+            try{
+    
+              if (!_user.emailVerified) {
+                await auth().currentUser?.sendEmailVerification()
+                Alert.alert("E-mail não verificado","Acesse no e-mail cadastrado, clique no link enviado e tente novamente!");
+                setTimeout(async () => { 
+                  await auth().signOut();
+                  AsyncStorage.removeItem("@user");
+                  setUsuario({} as UsuarioType);
+                }, 500);
+                return;
+              } else{
 
-            if (!_user.emailVerified) {
-              await auth().currentUser?.sendEmailVerification()
-              Alert.alert("E-mail não verificado","Acesse no e-mail cadastrado, clique no link enviado e tente novamente!");
-              await auth().signOut();
-              AsyncStorage.removeItem("@user");
-              setUsuario({} as UsuarioType);
-              return;
-            }
+
+                const querySnapshot = await firestore().collection("usuario").where("email", "==", _user.email).get();
+                
+                if (!querySnapshot.empty) {
+                  const usuarioData = querySnapshot.docs[0].data() as UsuarioType;
+                  setUsuario(usuarioData)
+                }else{
+                  console.warn("Nenhum documento encontrado para o usuário");
+                  setUsuario({} as UsuarioType)
+                }
+              
+                const userData = {
+                  uid : _user.uid,
+                  email : _user.email
+                }
+    
+                AsyncStorage.setItem("@user",JSON.stringify(userData))
+                setLoged(true)
+                setTimeout(async () => { 
+                  setInitializing(false);
+                }, 500);
+                
+              }
+  
+              
+  
             
-
-            const querySnapshot = await firestore().collection("usuario").where("email", "==", _user.email).get();
-            
-            if (!querySnapshot.empty) {
-              const usuarioData = querySnapshot.docs[0].data() as UsuarioType;
-              setUsuario(usuarioData)
-            }else{
-              console.warn("Nenhum documento encontrado para o usuário");
-              setUsuario({} as UsuarioType)
+            }catch(error:any){
+              if (__DEV__) {
+              console.error("Erro ao buscar dados do Firestore:", error);
+              }
             }
-          
-            const userData = {
-              uid : _user.uid,
-              email : _user.email
-            }
-
-            AsyncStorage.setItem("@user",JSON.stringify(userData))
-            setInitializing(false);
-          
-          }catch(error:any){
-            if (__DEV__) {
-            console.error("Erro ao buscar dados do Firestore:", error);
-            }
+          }else{
+            AsyncStorage.removeItem("@user")
           }
-        }else{
-          AsyncStorage.removeItem("@user")
+          if(initializing) setInitializing(false)
+        }catch (error) {
+          if (__DEV__) {
+          console.error("Erro ao salvar ou remover dados do AsyncStorage:", error);
+          }
         }
-        if(initializing) setInitializing(false)
-      }catch (error) {
-        if (__DEV__) {
-        console.error("Erro ao salvar ou remover dados do AsyncStorage:", error);
-        }
-      }
-      
-    });    
-    return unsubscribe;
-  },[])
+        
+      });   
+      return unsubscribe; 
+    }
+    setInitializing(false);
+  },[action])
 
   useEffect(()=>{loadFromStorage()},[])
 
@@ -151,6 +172,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
           handleError(error)
           setInitializing(false);
         })
+        
 
       }else{
         setInitializing(false);
@@ -166,6 +188,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
 
   async function signOut():Promise<void>{
     try{
+      setLoged(false)
       await auth().signOut()
     }catch (error) {
       Alert.alert("Erro ao fazer logout, tente novamente!");
@@ -193,7 +216,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
     signUp,
     signIn,
     signOut,
-    modifyPassword
+    modifyPassword,
+    action,
+    setAction,
+    loged,
+    setLoged
   }
 
  return(

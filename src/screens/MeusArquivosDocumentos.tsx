@@ -121,7 +121,7 @@ export default function MeusArquivosDocumentos() {
         .where('uid', '==',user?.uid)
         .where('type','==','documento')
         .where('status','==',true)
-        .orderBy('dataCadastro','desc')
+        .orderBy('dataCadastro','asc')
         .get();
 
       if (!snapshot.empty) {

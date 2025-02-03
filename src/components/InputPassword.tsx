@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, TextInput, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -7,12 +7,22 @@ type Props = {
   placeHolder: any;
   keyboardType: any;
   onChangeText?: (it:string) => void;
+  focus : boolean;
+  steFocus: () => void;
 };
 
 
-export const InputPassword = ({ placeHolder , keyboardType,onChangeText}:Props) => {
+export const InputPassword = (
+  { 
+    placeHolder , 
+    keyboardType,
+    onChangeText,
+    focus,
+    steFocus
+  
+  }:Props) => {
   const [text, setText] = useState('');
-
+  const inputRef = useRef<TextInput>(null);
   const [security, setVisible] = useState(true);
 
   const toggletext = (it:string)=>{
@@ -25,9 +35,16 @@ export const InputPassword = ({ placeHolder , keyboardType,onChangeText}:Props) 
     setVisible(!security);
   };
 
+  useEffect(() => {
+    if (focus && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [focus]);
+
   return (
     <View style={styles.containerInput}>
       <TextInput style={styles.input}
+        ref={inputRef} 
         placeholder= {placeHolder}
         value = {text}
         onChangeText={toggletext}

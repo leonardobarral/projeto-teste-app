@@ -27,7 +27,6 @@ import { file } from '../../services/managerfiles';
 import { Dropdown } from "react-native-element-dropdown";
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { InputText } from '../components/InputText';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { NotFoundFile } from '../components/NotFoundFile';
 

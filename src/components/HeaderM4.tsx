@@ -50,7 +50,7 @@ export const HeaderM4 = ({imagem,name,navigation,editable,edit,onchangeImage}:Pr
             <Image
               // source={{uri: `data:image/jpeg;base64, ${imagem}`}}
               // source={ imagem !== "" ? {uri: `data:image/jpeg;base64, ${imagem}`} : editable ? require('../assets/images/botao-adicionar.png'):require('../assets/images/simbolo-do-usuario.png')}
-              source={ imagem !== "" ? {uri: `${imagem}`} : editable ? require('../assets/images/botao-adicionar.png'):require('../assets/images/simbolo-do-usuario.png')}
+              source={ imagem ? {uri: `${imagem}`} : editable ? require('../assets/images/botao-adicionar.png'):require('../assets/images/simbolo-do-usuario.png')}
               // source={image}
               style={styles.imagePersonal}
             />

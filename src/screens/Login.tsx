@@ -7,7 +7,7 @@ import { InputText } from '../components/InputText';
 import { InputPassword } from '../components/InputPassword';
 import {useNavigation} from '@react-navigation/native'
 import { ButtonComponent } from '../components/ButtonComponent';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // import { useFonts,Inter_700Bold, Inter_400Regular } from '@expo-google-fonts/inter';
 import { useUser } from '../context/Auth';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,8 +15,9 @@ import {AuthStack} from '../routes/AuthStack'
 
 
 export default function Login() {
+
   const{modifyPassword} = useUser();
-  const{signIn} = useUser();
+  const{signIn,setAction,action} = useUser();
   const [email, setEmail] = useState('');
   const [emailNewPassword, setEmailNewPassword] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +25,8 @@ export default function Login() {
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const [visiblemodal2, setVisiblemodal2] = useState(false);
+
+  useEffect(()=>{setAction("login")},[])
 
   const toggleVisible = (value:boolean) => {
     setVisible(value)
@@ -45,7 +48,6 @@ export default function Login() {
       const sanitizedEmail = sanitizeInput(email);
       await signIn(sanitizedEmail,password)
     }catch (error) {
-      
       Alert.alert("Erro ao fazer login:");
     };
   }
@@ -96,11 +98,11 @@ export default function Login() {
         </View>
 
         <View style = {styles.containerInputs}>
-          <InputText placeHolder={"E-mail"} focus = {false} steFocus={()=>{}} keyboardType="email-address" onChangeText={(it:string)=> setEmail(it)}/>
+          <InputText value = {email} placeHolder={"E-mail"} focus = {false} steFocus={()=>{}} keyboardType="email-address" onChangeText={(it:string)=> setEmail(it)}/>
         </View>
 
         <View style = {styles.containerInputs}>
-          <InputPassword placeHolder={"Senha"} keyboardType={"default"} onChangeText={(it)=> setPassword(it)}/>
+          <InputPassword focus={false} steFocus={()=>{}} placeHolder={"Senha"} keyboardType={"default"} onChangeText={(it)=> setPassword(it)}/>
         </View>
 
         <View style = {styles.containerLinkPassword}>
