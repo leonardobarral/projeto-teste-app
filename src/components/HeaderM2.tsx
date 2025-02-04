@@ -22,7 +22,7 @@ export const HeaderM2 = ({title,navigation,press}:Props) => {
       ></ImageBackground>
       <View style={[styles.menu, {top: insets.top }]}>
         <ButtonBack navigation={navigation}/>
-        <Text style={styles.title}>{title}</Text>
+        <Text allowFontScaling={false} style={styles.title}>{title}</Text>
         <ButtonShowbar press={() =>{
           if(press){
             press()

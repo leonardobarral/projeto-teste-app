@@ -55,9 +55,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
   const [action , setAction] = useState('');
   const [loged , setLoged] = useState(false);
   
-  useEffect(() => {
+  useEffect(() => { 
     console.log("v1 - ",action)
-    if(action == "cadastro") return;
+    if(action == "cadastro") {
+      return
+    }
     else if(action=='login'){
       const unsubscribe = auth().onAuthStateChanged(async(_user)=>{
         try{
@@ -71,6 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
                 setTimeout(async () => { 
                   await auth().signOut();
                   AsyncStorage.removeItem("@user");
+                  setInitializing(false)
                   setUsuario({} as UsuarioType);
                 }, 500);
                 return;
@@ -94,34 +97,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
     
                 AsyncStorage.setItem("@user",JSON.stringify(userData))
                 setLoged(true)
+
                 setTimeout(async () => { 
                   setInitializing(false);
-                }, 500);
-                
-              }
-  
-              
-  
-            
+                }, 1000);                
+              }            
             }catch(error:any){
+              if(initializing) setInitializing(false)
               if (__DEV__) {
               console.error("Erro ao buscar dados do Firestore:", error);
               }
             }
           }else{
+            if(initializing) setInitializing(false)
             AsyncStorage.removeItem("@user")
           }
-          if(initializing) setInitializing(false)
         }catch (error) {
+          if(initializing) setInitializing(false)
           if (__DEV__) {
-          console.error("Erro ao salvar ou remover dados do AsyncStorage:", error);
+          console.error("Erro ao salvar ou remover dados do AsyncStorage:", error); 
           }
         }
         
       });   
-      return unsubscribe; 
+      return unsubscribe;  
     }
-    setInitializing(false);
+    if(!action) setInitializing(false)
   },[action])
 
   useEffect(()=>{loadFromStorage()},[])
@@ -135,6 +136,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
 
   async function signUp(email:string , password:string):Promise<FirebaseAuthTypes.User | null | undefined> {
     try{
+      setAction("cadastro")
       setInitializing(true)
       if(email && password){
         
@@ -147,23 +149,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
           return null;
         })
         return user;
-
       }else{
         handleError('email ou senha inválidos')
         if(initializing) setInitializing(false)
         return null;
       }
-
     }catch(error:any){
       handleError(error)
       return null;
-    }finally {
-      if (initializing) setInitializing(false);
+    }
+    finally {
+      setTimeout(async () => { 
+        if (initializing) setInitializing(false);
+      }, 1000); 
+      
     }
   }
 
   async function signIn(email:string , password:string):Promise<void>{
     try{
+      setAction("login")
       setInitializing(true)
       if(email!=="" && password!==""){
         await auth()
@@ -181,15 +186,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
     }catch(error:any){
       handleError(error)
       setInitializing(false);
-    }finally {
-      setInitializing(false);
     }
   }
 
   async function signOut():Promise<void>{
     try{
+      setInitializing(true)
       setLoged(false)
       await auth().signOut()
+      setInitializing(false)
     }catch (error) {
       Alert.alert("Erro ao fazer logout, tente novamente!");
     }

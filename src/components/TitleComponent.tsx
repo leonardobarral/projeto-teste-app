@@ -4,7 +4,7 @@ import { Text, StyleSheet, View } from 'react-native';
 export const TitleComponent = ({ text }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.textName}>{text}</Text>
+      <Text allowFontScaling={false} style={styles.textName}>{text}</Text>
     </View>
   );
 };

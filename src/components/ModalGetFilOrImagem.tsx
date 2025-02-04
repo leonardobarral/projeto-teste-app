@@ -23,12 +23,12 @@ export const ModalGetFilOrImagem = ({visible,setVisible,functionCamera,functionF
     <TouchableOpacity style={styles.modal} onPressOut={() => setVisible(false)} >
       <View style={styles.modalContent}>
           
-        <Text style = {styles.text12}>
+        <Text allowFontScaling={false} style = {styles.text12}>
           Selecione uma opção
         </Text>
         <View style = {styles.container2}>
           <TouchableOpacity onPress={()=>{functionCamera(), setVisible(false)}} style={styles.button22}>
-            <Text style = {styles.text22}>
+            <Text allowFontScaling={false} style = {styles.text22}>
             Tirar Foto
             </Text>
             <Image
@@ -37,7 +37,7 @@ export const ModalGetFilOrImagem = ({visible,setVisible,functionCamera,functionF
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={()=>{functionFile(), setVisible(false)}} style={styles.button22}>
-            <Text style = {styles.text22}>
+            <Text allowFontScaling={false} style = {styles.text22}>
               Escolher Galeria
             </Text>
             

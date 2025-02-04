@@ -10,7 +10,7 @@ type Props = {
 export const ButtonComponent = ({ name,press}:Props) => {
   return (
     <TouchableOpacity style={styles.button} onPress={press} >
-      <Text style={styles.textName}>{name}</Text>
+      <Text allowFontScaling={false} style={styles.textName}>{name}</Text>
     </TouchableOpacity>
   );
 };

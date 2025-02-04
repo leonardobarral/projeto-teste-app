@@ -17,7 +17,7 @@ import {AuthStack} from '../routes/AuthStack'
 export default function Login() {
 
   const{modifyPassword} = useUser();
-  const{signIn,setAction,action} = useUser();
+  const{signIn,setAction} = useUser();
   const [email, setEmail] = useState('');
   const [emailNewPassword, setEmailNewPassword] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +26,6 @@ export default function Login() {
   const [visible, setVisible] = useState(false);
   const [visiblemodal2, setVisiblemodal2] = useState(false);
 
-  useEffect(()=>{setAction("login")},[])
 
   const toggleVisible = (value:boolean) => {
     setVisible(value)
@@ -107,7 +106,7 @@ export default function Login() {
 
         <View style = {styles.containerLinkPassword}>
           <TouchableOpacity onPress={()=>toggleVisible(true)}>
-            <Text style={styles.linkPassword}>Esqueceu a senha?</Text>
+            <Text style={styles.linkPassword} allowFontScaling={false}>Esqueceu a senha?</Text>
           </TouchableOpacity>
         </View>
         
@@ -119,10 +118,10 @@ export default function Login() {
 
         <View style = {styles.containerLinkCadastro}>
 
-          <Text style={styles.textCadastro}>Novo aqui?</Text>
+          <Text style={styles.textCadastro} allowFontScaling={false}>Novo aqui?</Text>
 
           <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
-            <Text style={styles.linkCadastro}>Cadastre-se</Text>
+            <Text style={styles.linkCadastro} allowFontScaling={false}>Cadastre-se</Text>
           </TouchableOpacity>
 
         </View>
@@ -149,10 +148,10 @@ export default function Login() {
           }}
         >
           <View style={styles.containerPassword}>
-            <Text style={styles.text1}>Alteração de senha</Text>
-            <Text style={styles.text2} numberOfLines={3} >Digite o seu e-mail de usuário e lhe enviaremos uma mensagem para redefinição de sua senha.</Text>
+            <Text style={styles.text1} allowFontScaling={false}>Alteração de senha</Text>
+            <Text style={styles.text2} numberOfLines={3} allowFontScaling={false}>Digite o seu e-mail de usuário e lhe enviaremos uma mensagem para redefinição de sua senha.</Text>
               <View style = {styles.containerRedefinition}>
-                <InputText placeHolder={"E-mail"} focus = {false} steFocus={()=>{}} keyboardType="email-address" onChangeText={(it:string)=> setEmailNewPassword(it)}/>
+                <InputText placeHolder={"E-mail"} value = {emailNewPassword} focus = {false} steFocus={()=>{}} keyboardType="email-address" onChangeText={(it:string)=> setEmailNewPassword(it)}/>
                 <ButtonComponent name={"Enviar" } press = {()=>handleModifyPassword(emailNewPassword)}/>
               </View>
           </View>
@@ -170,8 +169,8 @@ export default function Login() {
           onPressOut={() => {setVisiblemodal2(false),setEmailNewPassword("")}}
         >
           <View style={styles.containerPassword2}>
-            <Text style={styles.text12}>Alteração de senha</Text>
-            <Text style={styles.text22} numberOfLines={3} ellipsizeMode="tail">Foi enviado um <Text style={styles.email2}>e-mail</Text> de alteração de senha para o endereço <Text style={styles.email2}>{maskEmail(emailNewPassword)}</Text>.</Text>
+            <Text style={styles.text12} allowFontScaling={false}>Alteração de senha</Text>
+            <Text style={styles.text22} numberOfLines={3} ellipsizeMode="tail" allowFontScaling={false}>Foi enviado um <Text style={styles.email2} allowFontScaling={false}>e-mail</Text> de alteração de senha para o endereço <Text style={styles.email2} allowFontScaling={false}>{maskEmail(emailNewPassword)}</Text>.</Text>
           </View>
         </TouchableOpacity>
       </Modal>

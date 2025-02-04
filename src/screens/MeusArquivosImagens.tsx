@@ -168,7 +168,7 @@ export default function MeusArquivosImagens() {
                 toggleselecting(true);
               }
             }}>
-            <Text style={styles.textSelection}>{textSelection}</Text>
+            <Text style={styles.textSelection} allowFontScaling={false}>{textSelection}</Text>
           </TouchableOpacity>
 
           <View style = {styles.containerList}>

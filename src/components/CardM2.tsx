@@ -12,7 +12,7 @@ export const CardM2 = ({imagePath, text, page }) => {
         source={imagePath}
         style={styles.image}
       />
-      <Text style={styles.text}>{text}</Text>
+      <Text allowFontScaling={false} style={styles.text}>{text}</Text>
     </TouchableOpacity>
   );
 };

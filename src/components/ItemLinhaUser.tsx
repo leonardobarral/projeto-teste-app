@@ -33,7 +33,7 @@ export const ItemLinhaUser  = ({ keyValue , value , colorValue,editable,onChange
   return (
     <View style={styles.container}>
 
-      <Text style={styles.key}>{keyValue}</Text>
+      <Text allowFontScaling={false} style={styles.key}>{keyValue}</Text>
 
       <TextInput style={[styles.valueState, { color: color ,backgroundColor : colorBackGround,borderColor:borderColor, borderWidth:borderWidth,width:Width}]}
         placeholder= {value}

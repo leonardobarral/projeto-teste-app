@@ -17,7 +17,7 @@ export const ButtonComponentCircleM3 = ({imagePath, text, funcionpress}:Props) =
           style={styles.image}
         />
       </View>
-      <Text style={styles.text}>{text}</Text>
+      <Text allowFontScaling={false} style={styles.text}>{text}</Text>
     </TouchableOpacity>
   );
 };

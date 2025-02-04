@@ -19,7 +19,7 @@ import { InputPassword } from '../components/InputPassword';
 
 export default function Cadastro() {
     const{signUp} = useUser();
-    const{setAction} = useUser();
+    const{setAction,setInitializing} = useUser();
     const navigation = useNavigation<AuthStack>();
 
     const [nome, setNome] = useState("");
@@ -59,10 +59,11 @@ export default function Cadastro() {
         }
     };
 
+    
 
     const getEmailFromCPF = async (cpf: string) => {
 
-        useEffect(()=>{setAction("cadastro")},[])
+        
         const ncpf = sanitizeInput(cpf)
         const usersRef = firestore().collection("usuario");
         const querySnapshot = await usersRef.where("cpf", "==", ncpf).get();
@@ -224,6 +225,11 @@ export default function Cadastro() {
                     await emailPublicoCollectionRef.doc(currentUserId).set({email:userObjeto.email});
                     
                     await auth().signOut()
+
+                    setTimeout(async () => { 
+                        setInitializing(false)
+                    }, 500);
+                    
                     
                     navigation.navigate('Login')
                     Alert.alert(
@@ -288,10 +294,10 @@ export default function Cadastro() {
 
                 <View style = {styles.containerLinkLogin}>
 
-                    <Text style={styles.textLogin}>Já possui uma conta?</Text>
+                    <Text style={styles.textLogin} allowFontScaling={false}>Já possui uma conta?</Text>
 
                     <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                        <Text style={styles.linkLogin}>Entrar</Text>
+                        <Text style={styles.linkLogin} allowFontScaling={false}>Entrar</Text>
                     </TouchableOpacity>
 
                 </View>

@@ -200,7 +200,7 @@ export default function MeusArquivosDocumentos() {
               }
             }}
           >
-            <Text style={styles.textSelection}>{textSelection}</Text>
+            <Text style={styles.textSelection} allowFontScaling={false}>{textSelection}</Text>
           </TouchableOpacity>
           <View style={styles.containerList}>
             {spiner?<ActivityIndicator size="large" />:

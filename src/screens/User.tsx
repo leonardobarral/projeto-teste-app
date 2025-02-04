@@ -269,14 +269,14 @@ export default function Login() {
         <TouchableOpacity style={styles.button} onPress={()=>{
           handleModifyPassword();
         }}>
-          <Text style={styles.textName}>Alterar senha</Text>
+          <Text allowFontScaling={false} style={styles.textName}>Alterar senha</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button2} onPress={()=>{
           // toggleVisible(true)
           handleSignOut()
           }}>
-          <Text style={styles.textName2}>Sair</Text>
+          <Text allowFontScaling={false} style={styles.textName2}>Sair</Text>
         </TouchableOpacity>
 
       </View>
@@ -298,8 +298,8 @@ export default function Login() {
           }}
         >
           <View style={styles.containerPassword}>
-            <Text style={styles.text1}>Alteração de senha</Text>
-            <Text style={styles.text2} numberOfLines={3} ellipsizeMode="tail">Foi enviado um <Text style={styles.email}>e-mail</Text> de alteração de senha para o endereço <Text style={styles.email}>{maskEmail(user?.email)}</Text>.</Text>
+            <Text allowFontScaling={false} style={styles.text1}>Alteração de senha</Text>
+            <Text allowFontScaling={false} style={styles.text2} numberOfLines={3} ellipsizeMode="tail">Foi enviado um <Text allowFontScaling={false} style={styles.email}>e-mail</Text> de alteração de senha para o endereço <Text allowFontScaling={false} style={styles.email}>{maskEmail(user?.email)}</Text>.</Text>
           </View>
         </TouchableOpacity>
       </Modal>

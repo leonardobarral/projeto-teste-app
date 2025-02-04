@@ -29,7 +29,7 @@ export const HeaderM3 = ({title,press,imagem}:Props) => {
               source={imagem? {uri: `${imagem}`}:require('../assets/images/simbolo-do-usuario.png')}
               style={styles.imageUser}
             />
-          <Text style={styles.title}>{title}</Text>
+          <Text allowFontScaling={false} style={styles.title}>{title}</Text>
         </TouchableOpacity>
         <ButtonShowbar press={() =>{
           if(press){

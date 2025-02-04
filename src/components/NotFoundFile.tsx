@@ -11,7 +11,7 @@ export function NotFoundFile({ value }: NotFoundFileProps) {
       source={vazio}
       style={styles.image}
     />
-    <Text style={{fontSize:20, fontWeight:'500',color:"#ff0000", marginTop:-60, zIndex:99, textAlign:'center'}}>{value}</Text>
+    <Text allowFontScaling={false} style={{fontSize:20, fontWeight:'500',color:"#ff0000", marginTop:-60, zIndex:99, textAlign:'center'}}>{value}</Text>
   </View>
  )
 }

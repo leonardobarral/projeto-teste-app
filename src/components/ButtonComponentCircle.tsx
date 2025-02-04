@@ -14,7 +14,7 @@ export const ButtonComponentCircle = ({ imagePath, text, onPress}:Props) => {
         source={imagePath}
         style={styles.image}
       />
-      <Text style={styles.text}>{text}</Text>
+      <Text allowFontScaling={false} style={styles.text}>{text}</Text>
     </TouchableOpacity>
   );
 };

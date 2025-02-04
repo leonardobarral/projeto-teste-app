@@ -53,7 +53,7 @@ export const Bar = () => {
         >
         <View style = {styles.bar}>
           <View style ={styles.lineTite}> 
-              <Text style = {[styles.textBar, isUnderlined1 && styles.underlinedText]} 
+              <Text allowFontScaling={false} style = {[styles.textBar, isUnderlined1 && styles.underlinedText]} 
               onPress={()=>{
                 setIsUnderlined1(true);
                 handleActionLink(1)
@@ -63,7 +63,7 @@ export const Bar = () => {
             </Text>
           </View>
           <View style ={styles.line}> 
-            <Text style = {[styles.textBar, isUnderlined2 && styles.underlinedText]} 
+            <Text allowFontScaling={false} style = {[styles.textBar, isUnderlined2 && styles.underlinedText]} 
               onPress={()=>{
                 setIsUnderlined2(true);
                 handleActionLink(2)
@@ -71,7 +71,7 @@ export const Bar = () => {
               >
               Enviar novo arquivo
             </Text>
-            <Text style = {[styles.textBar, isUnderlined3 && styles.underlinedText]} 
+            <Text allowFontScaling={false} style = {[styles.textBar, isUnderlined3 && styles.underlinedText]} 
               onPress={()=>{
                 setIsUnderlined3(true);
                 handleActionLink(3)
@@ -79,7 +79,7 @@ export const Bar = () => {
               >
               Vizualizar imagens
             </Text>
-            <Text style = {[styles.textBar, isUnderlined4 && styles.underlinedText]} 
+            <Text allowFontScaling={false} style = {[styles.textBar, isUnderlined4 && styles.underlinedText]} 
               onPress={()=>{
                 setIsUnderlined4(true);
                 handleActionLink(4)
@@ -89,7 +89,7 @@ export const Bar = () => {
             </Text>
           </View>
           <View style ={styles.linefooter}> 
-            <Text style = {[styles.textBar, isUnderlined5 && styles.underlinedText]} 
+            <Text allowFontScaling={false} style = {[styles.textBar, isUnderlined5 && styles.underlinedText]} 
               onPress={()=>{
                 setIsUnderlined5(true);
                 handleActionLink(5) 
@@ -97,7 +97,7 @@ export const Bar = () => {
               >
               Perfil
             </Text>
-            <Text style = {[styles.textBar, isUnderlined6 && styles.underlinedText]} 
+            <Text allowFontScaling={false} style = {[styles.textBar, isUnderlined6 && styles.underlinedText]} 
               onPress={()=>{
                 setIsUnderlined6(true);
                 handleActionLink(6) 

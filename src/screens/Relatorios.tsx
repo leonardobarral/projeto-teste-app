@@ -272,7 +272,7 @@ export default function Relatorios() {
               }
             }}
             >
-            <Text style={styles.textSelection}>{'textSelection'}</Text>
+            <Text style={styles.textSelection} allowFontScaling={false}>{'textSelection'}</Text>
           </TouchableOpacity> */}
 
           <View style = {styles.filtercontainer}>
@@ -287,10 +287,10 @@ export default function Relatorios() {
               {showOrder&&(
                 <View style={styles.boxOrder}>
                   <TouchableOpacity style = {styles.filterOrder} onPress={()=>{setShowOrder(false),setOrder("asc")}}>
-                    <Text style={styles.textButtonOrder}>Ordenar por Data Crescente</Text>
+                    <Text style={styles.textButtonOrder} allowFontScaling={false}>Ordenar por Data Crescente</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style = {styles.filterOrder} onPress={()=>{setShowOrder(false),setOrder("desc")}}>
-                    <Text style={styles.textButtonOrder}>Ordenar por Data Decrescente</Text>
+                    <Text style={styles.textButtonOrder} allowFontScaling={false}>Ordenar por Data Decrescente</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -305,7 +305,7 @@ export default function Relatorios() {
                   setNextFilterDataMax(filterDataMax)
                   setShow(!show)
                 }}>
-                <Text style={styles.textButton}>{'Data'}</Text>
+                <Text style={styles.textButton} allowFontScaling={false}>{'Data'}</Text>
                 <Image
                   source={calendar}
                   style={styles.imagevectorfilter1}
@@ -318,7 +318,7 @@ export default function Relatorios() {
 
                   <View style={styles.boxDataFilter}>
                     <TouchableOpacity style={!alertData1?styles.inputLikeButton:styles.inputLikeButtonAlert} onPress={() => setShowMin(true)}>
-                      <Text style={nextFilterDataMin ? styles.textSelected : styles.placeholder}>
+                      <Text allowFontScaling={false} style={nextFilterDataMin ? styles.textSelected : styles.placeholder}>
                         {nextFilterDataMin ? nextFilterDataMin : 'Data Mínima'}
                       </Text>
                     </TouchableOpacity>
@@ -326,7 +326,7 @@ export default function Relatorios() {
                     <View style={styles.barr}></View>
 
                     <TouchableOpacity style={!alertData2?styles.inputLikeButton:styles.inputLikeButtonAlert} onPress={() => setShowMax(true)}>
-                      <Text style={nextFilterDataMax ? styles.textSelected : styles.placeholder}>
+                      <Text allowFontScaling={false} style={nextFilterDataMax ? styles.textSelected : styles.placeholder}>
                         {nextFilterDataMax ? nextFilterDataMax : 'Data Máxima'}
                       </Text>
                     </TouchableOpacity>
@@ -334,27 +334,27 @@ export default function Relatorios() {
                   </View>
 
                   { alertData1?
-                    <View style={styles.msgAlert}><Text style={{color:"#ff0000",fontWeight:"600"}}>Data selecionada maior que data máxima!</Text></View>
+                    <View style={styles.msgAlert}><Text allowFontScaling={false} style={{color:"#ff0000",fontWeight:"600"}}>Data selecionada maior que data máxima!</Text></View>
                   :alertData2?
-                    <View style={styles.msgAlert}><Text style={{color:"#ff0000",fontWeight:"600"}}>Data selecionada menor que data mínima!</Text></View>
+                    <View style={styles.msgAlert}><Text allowFontScaling={false} style={{color:"#ff0000",fontWeight:"600"}}>Data selecionada menor que data mínima!</Text></View>
                   :null
                   }
 
                   <View style={styles.filterDataBottonsSends}>
 
                     <TouchableOpacity style={styles.btnVoltar} onPress={()=>{setShow(false),setAlertData1(false),setAlertData2(false),handleFilterApply(filterDataMin,filterDataMax)}}>
-                      <Text style={{color: '#807979',fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Voltar</Text>
+                      <Text allowFontScaling={false} style={{color: '#807979',fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Voltar</Text>
                     </TouchableOpacity>
 
                     {(nextFilterDataMin||nextFilterDataMax)&&(
                       <TouchableOpacity style={styles.btnLimpar} onPress={()=>{setNextFilterDataMin(""),setNextFilterDataMax(""),setAlertData1(false),setAlertData2(false)}}>
-                        <Text style={{color:"#ffffff",fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Limpar</Text>
+                        <Text allowFontScaling={false} style={{color:"#ffffff",fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Limpar</Text>
                       </TouchableOpacity>
                     )}
                     
                     {((alertData1||alertData2 || (nextFilterDataMin==""&&nextFilterDataMax==""))&&filterDataMin==""&&filterDataMax=="")?
                       <TouchableOpacity style={styles.btnAplicarDesable} disabled={true}>
-                        <Text style={{color:"#ffffff",fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Aplicar</Text>
+                        <Text allowFontScaling={false} style={{color:"#ffffff",fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Aplicar</Text>
                       </TouchableOpacity>
                     :
                       <TouchableOpacity style={styles.btnAplicar} onPress={()=>{
@@ -365,7 +365,7 @@ export default function Relatorios() {
                         handleFilterApply(nextFilterDataMin,nextFilterDataMax)
                         setShow(false)
                       }}>
-                        <Text style={{color:"#ffffff",fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Aplicar</Text>
+                        <Text allowFontScaling={false} style={{color:"#ffffff",fontWeight:'500', width:"100%", textAlign:"center",fontSize:20}}>Aplicar</Text>
                       </TouchableOpacity>}
 
                   </View>
@@ -405,7 +405,7 @@ export default function Relatorios() {
 
 
               <TouchableOpacity style = {styles.filtertype} onPress={()=>{setShowTipo(!showTipo)}}>
-                <Text style={styles.textButton}>{filterType?filterType=="imagem"?"Imagens":"Documentos":'Tipo'}</Text>
+                <Text allowFontScaling={false} style={styles.textButton}>{filterType?filterType=="imagem"?"Imagens":"Documentos":'Tipo'}</Text>
                 <Image
                   source={iconamoon_arrow}
                   style={styles.iconStyle}
@@ -414,10 +414,10 @@ export default function Relatorios() {
               {showTipo&&(
                 <View style={styles.boxTipo}>
                   <TouchableOpacity style = {styles.filterOrder} onPress={()=>{ handleFiltertype("documento"),setShowTipo(false)}}>
-                    <Text style={styles.textButtonOrder}>Documentos</Text>
+                    <Text allowFontScaling={false} style={styles.textButtonOrder}>Documentos</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style = {styles.filterOrder} onPress={()=>{ handleFiltertype("imagem"),setShowTipo(false)}}>
-                    <Text style={styles.textButtonOrder}>Imagens</Text>
+                    <Text allowFontScaling={false} style={styles.textButtonOrder}>Imagens</Text>
                   </TouchableOpacity>
                 </View>
               )}

@@ -72,11 +72,11 @@ export const CardM5 = ({
           style={styles.image}
         />
         <View style = {styles.containerText}>
-          <Text style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{text1}</Text>
-          <Text style={styles.text3}>{text2}</Text>
-          <Text style={styles.text2}>{text3}</Text>
-          <Text style={styles.text3}>{text4}</Text>
-          <Text style={styles.text3}>{text5}</Text>
+          <Text allowFontScaling={false} style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{text1}</Text>
+          <Text allowFontScaling={false} style={styles.text3}>{text2}</Text>
+          <Text allowFontScaling={false} style={styles.text2}>{text3}</Text>
+          <Text allowFontScaling={false} style={styles.text3}>{text4}</Text>
+          <Text allowFontScaling={false} style={styles.text3}>{text5}</Text>
         </View>
       </View>
     </TouchableOpacity>

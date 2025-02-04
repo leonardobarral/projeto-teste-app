@@ -91,10 +91,10 @@ export const CardM4 = ({
           style={styles.image}
         />
         <View style = {styles.containerText}>
-          <Text style={styles.text1}>{`Enviado em ${text3}`}</Text>
-          <Text style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{name}</Text>
-          <Text style={styles.text2}>{text2}</Text>
-          <Text style={styles.text3}>{text4}</Text>
+          <Text allowFontScaling={false} style={styles.text1}>{`Enviado em ${text3}`}</Text>
+          <Text allowFontScaling={false} style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{name}</Text>
+          <Text allowFontScaling={false} style={styles.text2}>{text2}</Text>
+          <Text allowFontScaling={false} style={styles.text3}>{text4}</Text>
         </View>
       </View>
     </TouchableOpacity>
