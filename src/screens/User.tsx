@@ -187,11 +187,12 @@ export default function Login() {
           await userCollectionRef.doc(uid).update(updatedUserData);
           
           Alert.alert(
-            "Dados atualizados com sucesso!",
-            "Você deverá fazer login novamente!"
+            "Dados atualizados com sucesso!"
           );
 
-          handleSignOut()
+          // handleSignOut()
+
+          navigation.goBack()
           setSpiner(false)
 
         }else { 

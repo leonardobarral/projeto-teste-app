@@ -13,7 +13,8 @@ type Props = {
   longPress?: () => void;
   number?: (value: number) => void;
   action?: (it:[string,string,string]) => void;
-  extecao:any
+  extecao:any,
+  view?: (it:string) => void;
 };
 
 
@@ -29,7 +30,8 @@ export const CardM4 = ({
   longPress,
   number,
   action,
-  extecao
+  extecao,
+  view
 }:Props) => {
 
   const [status, setStatus] = useState(false);
@@ -41,6 +43,9 @@ export const CardM4 = ({
     if(!value &&  action){
       action([imagePath,'remove',name])
     }
+  };
+  const toggleView = () => {
+    if(imagePath && view) view(imagePath)
   };
   // const toggleStatus = (value: boolean) => {
   //   setStatus(value);
@@ -71,6 +76,8 @@ export const CardM4 = ({
       if(selecting){
         if(status) toggleStatus(false)
         else(toggleStatus(true))
+      }else{
+        toggleView()
       }
     }}     
     

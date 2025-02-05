@@ -11,7 +11,7 @@ type Props = {
   longPress?: () => void;
   number?: (value: number) => void;
   action?: (it:[string,string]) => void;
-  view?: (it:string) => void;
+  view?: (it:string) => void; 
 };
 
 
