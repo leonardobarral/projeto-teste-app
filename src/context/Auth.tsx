@@ -1,6 +1,6 @@
 import React,{useContext, createContext, useState, useEffect, ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import auth, { FirebaseAuthTypes, reload } from "@react-native-firebase/auth";
 import { Alert } from "react-native";
 import errorMessages from './msgAlertFireBase.json';
 import firestore from "@react-native-firebase/firestore";
@@ -27,6 +27,7 @@ interface AuthContexDate{
  initializing : boolean;
  setInitializing: React.Dispatch<React.SetStateAction<boolean>>
  setUser: React.Dispatch<React.SetStateAction<FirebaseAuthTypes.User | null>>;
+ setUsuario:React.Dispatch<React.SetStateAction<UsuarioType>>;
  signUp:(email:string,password : string) => Promise<FirebaseAuthTypes.User | null | undefined>;
  signIn:(email:string,password : string) => Promise<void>;
  signOut:() => Promise<void>;
@@ -120,9 +121,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
         }
         
       });   
-      return unsubscribe;  
+      return unsubscribe;   
     }
+    else if( action == 'reload'){
+      const _user = auth().currentUser
+      const reload = async()=>{
+          try{
+          const querySnapshot = await firestore().collection("usuario").where("email", "==", _user?.email).get();
+          
+          if (!querySnapshot.empty) {
+            const usuarioData = querySnapshot.docs[0].data() as UsuarioType;
+            setUsuario(usuarioData)
+          }else{
+            console.warn("Nenhum documento encontrado para o usuário");
+            // setUsuario({} as UsuarioType)
+          }
+        }catch(error){
+          Alert.alert("Erro ao carregar dados atualizados!")
+        }
+      }
+      return reload;  
+    };
+
+
     if(!action) setInitializing(false)
+
   },[action])
 
   useEffect(()=>{loadFromStorage()},[])
@@ -218,6 +241,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
     setUser,
     setInitializing,
     usuario,
+    setUsuario,
     signUp,
     signIn,
     signOut,
@@ -271,6 +295,7 @@ export type records = {
   cidade: string,
   quantidade: number ,
   uf:string
-  timestamp: number
+  timestamp: number,
+  itens:fileDoc[]
 }
 

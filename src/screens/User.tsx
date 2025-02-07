@@ -23,7 +23,7 @@ import React from "react";
 
 export default function Login() {
   const [spiner, setSpiner] = useState(false);
-  const{signOut,modifyPassword,user,usuario} = useUser();
+  const{signOut,modifyPassword,user,usuario,setAction,setUsuario,setInitializing} = useUser();
   
   const [imagem, setImagem] = useState(usuario.imagem||null);
 
@@ -157,7 +157,7 @@ export default function Login() {
   }
 
   const handleModifyUsuario = async ()=>{
-    setSpiner(true)
+    setInitializing(true)
     try{
       if(validarCampos()){
         const userCollectionRef = firestore().collection("usuario");
@@ -190,21 +190,23 @@ export default function Login() {
             "Dados atualizados com sucesso!"
           );
 
-          // handleSignOut()
+          navigation.navigate('Home')
 
-          navigation.goBack()
-          setSpiner(false)
+          // setAction('reload')
+          setUsuario((prevUsuario) => ({ ...prevUsuario, ...updatedUserData }));
+          
+          setInitializing(false)
 
         }else { 
-          setSpiner(false)
+          setInitializing(false)
           Alert.alert("Erro", "Usuário não encontrado.");
         }
       }else{
-        setSpiner(false)
+        setInitializing(false)
         Alert.alert("Algum dado está inconsistente");
       }
     }catch(error){
-      setSpiner(false)
+      setInitializing(false)
       Alert.alert("Erro de atualização, tente novemente.");
       console.log(error)
       setEditable(false)
@@ -262,7 +264,7 @@ export default function Login() {
 
       <View style = {styles.body}>
 
-        <ItemLinhaUser keyValue = {"Nome"} value = {name} colorValue ={'#00000036'} editable={editable} onChangeText={(it:string)=>setName(it)}/>
+        <ItemLinhaUser keyValue = {"Nome"} value = {name} colorValue ={'#000000'} editable={editable} onChangeText={(it:string)=>setName(it)}/>
         <ItemLinhaUser keyValue = {"CPF"} value = {maskCPF(cpf)} colorValue ={'#00000036'} editable={false} onChangeText={(it:string)=>setCpf(it)}/>
         <ItemLinhaUser keyValue = {"E-mail"} value = {email} colorValue ={'#000000'} editable={editable} onChangeText={(it:string)=>setEmail(it)}/>
         <ItemLinhaUser keyValue = {"Telefone"} value = {masTelefone(telefone)} colorValue ={'#000000'} editable={editable} onChangeText={(it:string)=>setTelefone(it)}/>
@@ -286,16 +288,16 @@ export default function Login() {
         visible={visible}
         animationType="fade"
         onRequestClose={() => {
-          // toggleVisible(false)
-          handleSignOut()
+          toggleVisible(false)
+          // handleSignOut()
         }}
       >
         <TouchableOpacity
           style={styles.modal}
           activeOpacity={0.4}      
           onPressOut={() => {
-            // toggleVisible(false)
-            handleSignOut()
+            toggleVisible(false)
+            // handleSignOut()
           }}
         >
           <View style={styles.containerPassword}>
