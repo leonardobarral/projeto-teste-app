@@ -7,6 +7,7 @@ import {
   StatusBar,
   FlatList,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { HeaderM2 } from "../components/HeaderM2";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,7 +15,7 @@ import { CardM4 } from "../components/CardM4";
 import { SetStateAction, useEffect, useState } from "react";
 import { ButtonComponentCircleM2 } from "../components/ButtonComponentCircleM2";
 import Doc from "../assets/images/Doc.png";
-import Pdf from "../assets/images/Pdf.png";
+import PdfImage from "../assets/images/Pdf.png";
 import xls from "../assets/images/xls.png";
 import txt from "../assets/images/txt.png";
 import ppt from "../assets/images/ppt.png";
@@ -38,7 +39,7 @@ import {
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import doctypes from "../components/docTypes.json";
 import { NotFoundFile } from "../components/NotFoundFile";
-
+import Pdf from 'react-native-pdf';
 
 
 export default function MeusArquivosDocumentos() {
@@ -49,6 +50,17 @@ export default function MeusArquivosDocumentos() {
   // const [visibleBar, setvisibleBar] = useState(false);
   const [visibleButtonShare, setVisibleButtonShare] = useState(false);
   const [loadVisible, setloadVisible] = useState(false);
+
+  const [showDocumentoGreat, setShowDocumentoGreat] = useState(false); 
+  const [showDocumentoItem, setShowDocumentoItem] = useState("");
+  
+  const handleShowDocument=(file:string)=>{
+
+    const newFile = file
+
+    setShowDocumentoItem(newFile)
+  }
+
 
   const toggleVisibleBar = () => {
     setVisibleBar(!visibleBar);
@@ -166,7 +178,7 @@ export default function MeusArquivosDocumentos() {
   };
 
   const image = (url: string) => {
-    if (getFilePath(getFileExtension(url)) == "pdf") return Pdf;
+    if (getFilePath(getFileExtension(url)) == "pdf") return PdfImage;
     if (getFilePath(getFileExtension(url)) == "ppt") return ppt;
     if (getFilePath(getFileExtension(url)) == "txt") return txt;
     if (getFilePath(getFileExtension(url)) == "xls") return xls;
@@ -179,6 +191,11 @@ export default function MeusArquivosDocumentos() {
     }
     return "";
   };
+
+  useEffect(()=>{
+    console.log({uri:showDocumentoItem, cache: true})
+    if(showDocumentoItem) setShowDocumentoGreat(true)
+  },[showDocumentoItem])
 
   return (
     <LinearGradient colors={["#F7FAFC", "#8BC4FD"]} style={styles.container}>
@@ -204,7 +221,7 @@ export default function MeusArquivosDocumentos() {
           </TouchableOpacity>
           <View style={styles.containerList}>
             {spiner?<ActivityIndicator size="large" />:
-            files.length == 0 ?<NotFoundFile value="Nenhuma imagem disponível!" />:
+            files.length == 0 ?<NotFoundFile value="Nenhuma documento disponível!" />:
             <FlatList
               contentContainerStyle={styles.containerCards}
               data={files}
@@ -221,6 +238,7 @@ export default function MeusArquivosDocumentos() {
                   selecting={selecting}
                   longPress={() => toggleselecting(true)}
                   number={(it) => toggleNumber(it)}
+                  view={(it) => handleShowDocument(it)}
                   action={(it) => toogleListAction(it[0], it[1], it[2])}
                 />
               )}
@@ -265,6 +283,28 @@ export default function MeusArquivosDocumentos() {
           </View>
         )}
       </View>
+       <Modal
+          transparent
+          visible={showDocumentoGreat}
+          animationType="fade"
+          onRequestClose={() => {setShowDocumentoGreat(false),setShowDocumentoItem("")}}
+        >
+          <TouchableOpacity
+            style={styles.modal2}
+            activeOpacity={0.4}      
+            onPressOut={() => {setShowDocumentoGreat(false),setShowDocumentoItem("")}}
+          >
+            <View style = {{flex:1,justifyContent : 'center',alignItems:'center'}}>
+              
+              <Pdf source={{uri:showDocumentoItem, cache: true}} style={{ flex: 1 }} onError={(error) => console.log(error)}/>
+              {/* <Image
+                source={{uri: `${showDocumentoItem}` }}
+                style={styles.image}
+                resizeMode="contain"
+              /> */}
+            </View>
+          </TouchableOpacity>
+        </Modal>
       <Modal
         transparent
         visible={loadVisible}
@@ -299,6 +339,12 @@ const styles = StyleSheet.create({
 
   header: {
     width: "100%",
+  },
+
+  
+  image:{
+    height : "100%",
+    width : "100%",
   },
 
   body: {
