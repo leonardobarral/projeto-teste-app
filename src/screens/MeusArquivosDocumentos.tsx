@@ -8,11 +8,8 @@ import {
   FlatList,
   ActivityIndicator,
   Image,
-<<<<<<< HEAD
-=======
   Dimensions,
   Alert,
->>>>>>> 165397f57ac696217f18a831567ff65192be817f
 } from "react-native";
 import { HeaderM2 } from "../components/HeaderM2";
 import { LinearGradient } from "expo-linear-gradient";
@@ -44,16 +41,10 @@ import {
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import doctypes from "../components/docTypes.json";
 import { NotFoundFile } from "../components/NotFoundFile";
-<<<<<<< HEAD
-import Pdf from 'react-native-pdf';
-=======
-
 import Pdf from 'react-native-pdf';
 
 import FileViewer from 'react-native-file-viewer';
 import RNFetchBlob from 'react-native-blob-util';
->>>>>>> 165397f57ac696217f18a831567ff65192be817f
-
 
 export default function MeusArquivosDocumentos() {
   const navigation = useNavigation<AppStack>();
@@ -65,17 +56,6 @@ export default function MeusArquivosDocumentos() {
   const [loadVisible, setloadVisible] = useState(false);
 
   const [showDocumentoGreat, setShowDocumentoGreat] = useState(false); 
-<<<<<<< HEAD
-  const [showDocumentoItem, setShowDocumentoItem] = useState("");
-  
-  const handleShowDocument=(file:string)=>{
-
-    const newFile = file
-
-    setShowDocumentoItem(newFile)
-  }
-
-=======
   const [showDocumentoItem, setShowDocumentoItem] = useState<{url:string,type:string}>();
   
   // ReactNativeBlobUtil.config({
@@ -132,8 +112,6 @@ export default function MeusArquivosDocumentos() {
   //     console.error("Erro ao buscar o PDF:", error);
   //   }
   // };
->>>>>>> 165397f57ac696217f18a831567ff65192be817f
-
   const toggleVisibleBar = () => {
     setVisibleBar(!visibleBar);
   };
@@ -265,12 +243,7 @@ export default function MeusArquivosDocumentos() {
   };
 
   useEffect(()=>{
-<<<<<<< HEAD
-    console.log({uri:showDocumentoItem, cache: true})
-    if(showDocumentoItem) setShowDocumentoGreat(true)
-=======
     if(showDocumentoItem?.url) setShowDocumentoGreat(true)
->>>>>>> 165397f57ac696217f18a831567ff65192be817f
   },[showDocumentoItem])
 
   return (
@@ -314,11 +287,7 @@ export default function MeusArquivosDocumentos() {
                   selecting={selecting}
                   longPress={() => toggleselecting(true)}
                   number={(it) => toggleNumber(it)}
-<<<<<<< HEAD
-                  view={(it) => handleShowDocument(it)}
-=======
                   view={(it) => handleShowDocument(it,item.extencao)}
->>>>>>> 165397f57ac696217f18a831567ff65192be817f
                   action={(it) => toogleListAction(it[0], it[1], it[2])}
                 />
               )}
@@ -417,8 +386,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
-<<<<<<< HEAD
-=======
   pdf: {
     flex:1,
     // width:Dimensions.get('window').width,
@@ -432,7 +399,6 @@ const styles = StyleSheet.create({
     backgroundColor:'#ff0000'
 },
 
->>>>>>> 165397f57ac696217f18a831567ff65192be817f
   
   image:{
     height : "100%",
