@@ -1,37 +1,52 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, Image, View } from 'react-native';
-import { fileDoc } from '../context/Auth';
+
 
 type Props = {
   imagePath: any;
+  name :string;
   text1: string;
   text2: string;
   text3: string;
-  text4: string;
-  text5: string;
-  // selecting: boolean;
-  // longPress?: () => void;
-  // number?: (value: number) => void;
-  onPress?: () => void;
+  text4: string|null;
+  selecting: boolean;
+  longPress?: () => void;
+  number?: (value: number) => void;
+  action?: (it:[string,string,string]) => void;
+  extecao:any,
+  view?: (it:string) => void;
 };
 
 
 
-export const CardM5 = ({
-    imagePath, 
-    text1,
-    text2,
-    text3,
-    text4,
-    text5,
-    // selecting,
-    // longPress,
-    // number
-    onPress,
-  }:Props) => {
+export const CardM41 = ({
+  imagePath, 
+  name,
+  text1,
+  text2,
+  text3,
+  text4,
+  selecting,
+  longPress,
+  number,
+  action,
+  extecao,
+  view
+}:Props) => {
 
   const [status, setStatus] = useState(false);
-  // const [status, setStatus] = useState(false);
+  const toggleStatus = (value: boolean) => {
+    setStatus(value);
+    if(value &&  action){
+      action([imagePath,'add',name])
+    }
+    if(!value &&  action){
+      action([imagePath,'remove',name])
+    }
+  };
+  const toggleView = () => {
+    if(imagePath && view) view(imagePath)
+  };
   // const toggleStatus = (value: boolean) => {
   //   setStatus(value);
   //   if(value && number){
@@ -42,49 +57,51 @@ export const CardM5 = ({
   //   }
   // };
 
-  const toggleView = () => {
-    if(imagePath && onPress) onPress()
-  };
+ 
 
+  // useEffect(()=>{
+  //   console.log(getFilePath(extecao))
+  //   console.log(getFilePath(extecao))
+  // },[])
   
   const backgroundColor = status ? "#ADD1F4" : "#ffffff";
+
+  // console.log(extecao)
 
   return (
     <TouchableOpacity 
     style={[styles.button, { backgroundColor }]} 
 
     onPress={()=>{
-      // if(selecting){
-      //   if(status) toggleStatus(false)
-      //   else(toggleStatus(true))
-      // }
-      toggleView()
+      if(selecting){
+        if(status) toggleStatus(false)
+        else(toggleStatus(true))
+      }else{
+        toggleView()
+      }
     }}     
     
-    // onLongPress={()=>{
-    //   if(selecting){
-    //     toggleStatus(!status)
-    //   }
-    //   if(!selecting){
-    //     if(longPress)longPress()
-    //       toggleStatus(true)
-    //   }
+    onLongPress={()=>{
+      if(selecting){
+        toggleStatus(!status)
+      }
+      if(!selecting){
+        if(longPress)longPress()
+          toggleStatus(true)
+      }
     
-    // }}
+    }}
     >
       <View style={styles.container}>
-        
-        
         <Image
-          source={typeof(imagePath) == 'number'?imagePath: {uri: `${imagePath}` }}
+          source={extecao}
           style={styles.image}
         />
         <View style = {styles.containerText}>
-          <Text allowFontScaling={false} style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{text1}</Text>
-          <Text allowFontScaling={false} style={styles.text3}>{text2}</Text>
-          <Text allowFontScaling={false} style={styles.text2}>{text3}</Text>
+          {/* <Text allowFontScaling={false} style={styles.text1}>{`Enviado em ${text3}`}</Text> */}
+          <Text allowFontScaling={false} style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{name}</Text>
+          {/* <Text allowFontScaling={false} style={styles.text2}>{text2}</Text> */}
           <Text allowFontScaling={false} style={styles.text3}>{text4}</Text>
-          <Text allowFontScaling={false} style={styles.text3}>{text5}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -94,26 +111,26 @@ export const CardM5 = ({
 const styles = StyleSheet.create({
   button: {
     width: '100%',
-    height: 131,
+    height: 70,
     paddingVertical : 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingHorizontal: 8,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     verticalAlign: 'middle',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 }, 
+    shadowColor: '#000000a4',
+    shadowOffset: { width: 0, height: 2 }, 
     shadowOpacity: 0.75,
-    shadowRadius: 12,
-    elevation: 12, 
-    marginBottom:10,
-    marginTop:10,
+    shadowRadius: 5,
+    elevation: 5, 
+    marginBottom:5,
+    marginTop:5,
     
   },
 
   container : {
     width : '100%',
-    height : 115,
+    minHeight : 90,
     flexDirection : 'row',
     columnGap :16,
     alignItems: 'center',
@@ -122,21 +139,21 @@ const styles = StyleSheet.create({
   },
 
   image:{
-    height : 56,
-    width : 56,
+    height : 50,
+    width : 50,
   },
 
   containerText:{
     flex : 1,
     flexDirection : 'column',
-    justifyContent : 'space-between',
+    justifyContent : 'center',
     alignItems : 'flex-start',
     height : '100%'
   },
 
   text1: {
     // height: 24,
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 20,
     fontWeight: '500',
     color: '#1C170D',
@@ -146,7 +163,7 @@ const styles = StyleSheet.create({
   },
   text2: {
     height: 24,
-    fontSize: 12,
+    fontSize: 16,
     lineHeight: 24,
     fontWeight: '500',
     color: '#1C170D',
@@ -156,7 +173,7 @@ const styles = StyleSheet.create({
   },
   text3: {
     height: 21,
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 21,
     fontWeight: '400',
     color: '#A1824A',

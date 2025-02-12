@@ -8,6 +8,11 @@ import {
   FlatList,
   ActivityIndicator,
   Image,
+<<<<<<< HEAD
+=======
+  Dimensions,
+  Alert,
+>>>>>>> 165397f57ac696217f18a831567ff65192be817f
 } from "react-native";
 import { HeaderM2 } from "../components/HeaderM2";
 import { LinearGradient } from "expo-linear-gradient";
@@ -39,7 +44,15 @@ import {
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import doctypes from "../components/docTypes.json";
 import { NotFoundFile } from "../components/NotFoundFile";
+<<<<<<< HEAD
 import Pdf from 'react-native-pdf';
+=======
+
+import Pdf from 'react-native-pdf';
+
+import FileViewer from 'react-native-file-viewer';
+import RNFetchBlob from 'react-native-blob-util';
+>>>>>>> 165397f57ac696217f18a831567ff65192be817f
 
 
 export default function MeusArquivosDocumentos() {
@@ -52,6 +65,7 @@ export default function MeusArquivosDocumentos() {
   const [loadVisible, setloadVisible] = useState(false);
 
   const [showDocumentoGreat, setShowDocumentoGreat] = useState(false); 
+<<<<<<< HEAD
   const [showDocumentoItem, setShowDocumentoItem] = useState("");
   
   const handleShowDocument=(file:string)=>{
@@ -61,6 +75,64 @@ export default function MeusArquivosDocumentos() {
     setShowDocumentoItem(newFile)
   }
 
+=======
+  const [showDocumentoItem, setShowDocumentoItem] = useState<{url:string,type:string}>();
+  
+  // ReactNativeBlobUtil.config({
+  //   trusty: true,
+  // })
+
+
+  const openDocument = async (file:string,type:string) => {
+    const fileUrl = file
+    const fileExt = type
+    const localFile = `${RNFetchBlob.fs.dirs.DocumentDir}/documento.${fileExt}`;
+  
+    try {
+      const res = await RNFetchBlob.config({ path: localFile }).fetch('GET', fileUrl);
+      await FileViewer.open(res.path());
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível abrir o documento.');
+    }
+  };
+
+  const handleShowDocument=(file:string,type:string)=>{
+    if( type == ".pdf") setShowDocumentoItem({url:file,type:type})
+    else{
+      openDocument(file,type)
+    }
+  }
+
+  // const handleShowDocument = async (file:string) => {
+  //   try {
+  //     const user = auth().currentUser;
+  //     if (!user) {
+  //       throw new Error("Usuário não autenticado");
+  //     }
+  //     // const url = await storage().ref(file).getDownloadURL();
+  //     const url = file
+  //     console.log(url)
+  //     const token = await user.getIdToken();
+  //     const res = await ReactNativeBlobUtil.config({
+  //       trusty: true,
+  //       fileCache: true,
+  //       appendExt: 'pdf'
+  //     }).fetch('GET', url, {
+  //       'Authorization': `Bearer ${token}`,
+  //       'User-Agent': 'Mozilla/5.0',
+  //       'Accept': 'application/pdf',
+  //     });
+
+  //     if (!res || !res.path()) {
+  //       throw new Error("Falha ao baixar o PDF");
+  //     }
+
+  //     setShowDocumentoItem(res.path());
+  //   } catch (error) {
+  //     console.error("Erro ao buscar o PDF:", error);
+  //   }
+  // };
+>>>>>>> 165397f57ac696217f18a831567ff65192be817f
 
   const toggleVisibleBar = () => {
     setVisibleBar(!visibleBar);
@@ -193,8 +265,12 @@ export default function MeusArquivosDocumentos() {
   };
 
   useEffect(()=>{
+<<<<<<< HEAD
     console.log({uri:showDocumentoItem, cache: true})
     if(showDocumentoItem) setShowDocumentoGreat(true)
+=======
+    if(showDocumentoItem?.url) setShowDocumentoGreat(true)
+>>>>>>> 165397f57ac696217f18a831567ff65192be817f
   },[showDocumentoItem])
 
   return (
@@ -238,33 +314,15 @@ export default function MeusArquivosDocumentos() {
                   selecting={selecting}
                   longPress={() => toggleselecting(true)}
                   number={(it) => toggleNumber(it)}
+<<<<<<< HEAD
                   view={(it) => handleShowDocument(it)}
+=======
+                  view={(it) => handleShowDocument(it,item.extencao)}
+>>>>>>> 165397f57ac696217f18a831567ff65192be817f
                   action={(it) => toogleListAction(it[0], it[1], it[2])}
                 />
               )}
             />}
-            {/* <View style = {styles.containerCards}>
-              <CardM4 
-                imagePath={Pdf}
-                text1 = {"Enviado em 3 de novembro de 2029"}
-                text2 = {"São Francisco, CA"}
-                text3 = {"3 de novembro de 2029"}
-                // text4 = {"1 item"}
-                selecting = {selecting}
-                longPress={() => toggleselecting(true)}
-                number={(it) => toggleNumber(it)}
-              />
-              <CardM4 
-                imagePath={Xls}
-                text1 = {"Enviado em 3 de janeiro de 2029"}
-                text2 = {"Salvador, BA"}
-                text3 = {"3 de janeiro de 2029"}
-                // text4 = {"1 item"}
-                selecting = {selecting}
-                longPress={() => toggleselecting(true)}
-                number={(it) => toggleNumber(it)}
-              />
-            </View>  */}
           </View>
         </View>
 
@@ -307,6 +365,23 @@ export default function MeusArquivosDocumentos() {
         </Modal>
       <Modal
         transparent
+        visible={showDocumentoGreat}
+        animationType="fade"
+        onRequestClose={() => {setShowDocumentoGreat(false),setShowDocumentoItem({url:"",type:""})}}
+      >
+        
+        <View style={styles.modal2}>
+          
+          {showDocumentoItem?.type==".pdf"?
+          <Pdf 
+            trustAllCerts={false}
+            source={{uri:`${showDocumentoItem.url}`, cache: true,headers: { "User-Agent": "Mozilla/5.0" }}} 
+            style={styles.pdf} 
+          />:null}
+        </View>
+      </Modal>
+      <Modal
+        transparent
         visible={loadVisible}
         animationType="fade"
         // onRequestClose={() => {setVisiblemodal2(false),setEmailNewPassword("")}}
@@ -337,10 +412,27 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
 
+
   header: {
     width: "100%",
   },
 
+<<<<<<< HEAD
+=======
+  pdf: {
+    flex:1,
+    // width:Dimensions.get('window').width,
+    // height:Dimensions.get('window').height,
+  },
+  containerPdf: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 25,
+    backgroundColor:'#ff0000'
+},
+
+>>>>>>> 165397f57ac696217f18a831567ff65192be817f
   
   image:{
     height : "100%",

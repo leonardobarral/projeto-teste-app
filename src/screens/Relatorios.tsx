@@ -30,6 +30,20 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { NotFoundFile } from '../components/NotFoundFile';
 
+import Doc from "../assets/images/Doc.png";
+import PdfImage from "../assets/images/Pdf.png";
+import xls from "../assets/images/xls.png";
+import txt from "../assets/images/txt.png";
+import ppt from "../assets/images/ppt.png";
+import { CardM4 } from '../components/CardM4';
+
+import doctypes from "../components/docTypes.json";
+import { CardM41 } from '../components/CardM4.1';
+import Pdf from 'react-native-pdf';
+
+import FileViewer from 'react-native-file-viewer';
+import RNFetchBlob from 'react-native-blob-util';
+
 
 export default function Relatorios() {
   const navigation = useNavigation<AppStack>();
@@ -59,6 +73,9 @@ export default function Relatorios() {
   const [ultimaData, setUltimaData] = useState("");
   const [nextFilterDataMin, setNextFilterDataMin] = useState("");
   const [nextFilterDataMax, setNextFilterDataMax] = useState("");
+
+  const [showImagemGreat, setShowImagemGreat] = useState(false); 
+  const [showImagemItem, setShowImagemItem] = useState<fileDoc[]>([]);
 
   // const [visibleBar, setvisibleBar] = useState(false);
   
@@ -101,6 +118,26 @@ export default function Relatorios() {
       
   //   }
   // };
+
+  const getFileExtension = (url: string): string => {
+    const match = url.match(/\.([a-zA-Z0-9]+)(\?|$)/);
+    return match ? match[1] : "";
+  };
+
+  const getFilePath = (extension: string): string => {
+    if (extension in doctypes) {
+      return doctypes[extension as keyof typeof doctypes];
+    }
+    return "";
+  };
+
+  const image = (url: string) => {
+    if (getFilePath(getFileExtension(url)) == "pdf") return PdfImage;
+    if (getFilePath(getFileExtension(url)) == "ppt") return ppt;
+    if (getFilePath(getFileExtension(url)) == "txt") return txt;
+    if (getFilePath(getFileExtension(url)) == "xls") return xls;
+    if (getFilePath(getFileExtension(url)) == "doc") return Doc;
+  };
 
   //lista de imagens
   const fetchRegisters = async () => {
@@ -218,12 +255,13 @@ export default function Relatorios() {
                     type: file.type,
                     cidade: file.cidade,
                     quantidade: 0,
+                    itens: [],
                     uf:file.uf,
                     timestamp: new Date(file.dataCriacao.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1")).getTime()
                 };
             }
             acc[key].quantidade += 1;
-    
+            acc[key].itens.push(file)
             return acc;
         }, {} as Record<string, records>)
     );
@@ -246,12 +284,47 @@ export default function Relatorios() {
     return {day:day,month:meses[parseInt(month)-1],year:year}
   } 
 
-  
+  useEffect(()=>{
+    if(showImagemItem.length>0) setShowImagemGreat(true)
+  },[showImagemItem])
+
+
   
 
 
   const insets = useSafeAreaInsets();
   const headerHeight = 68 + insets.top;
+
+
+  const [showDocumentoGreat, setShowDocumentoGreat] = useState(false); 
+  const [showDocumentoItem, setShowDocumentoItem] = useState<{url:string,type:string}>();
+  
+  const openDocument = async (file:string,type:string) => {
+      const fileUrl = file
+      const fileExt = type
+      const localFile = `${RNFetchBlob.fs.dirs.DocumentDir}/documento.${fileExt}`;
+    
+      try {
+        const res = await RNFetchBlob.config({ path: localFile }).fetch('GET', fileUrl);
+        await FileViewer.open(res.path());
+      } catch (error) {
+        Alert.alert('Erro', 'Não foi possível abrir o documento.');
+      }
+    };
+  const handleShowDocument=(file:string,type:string)=>{
+    if( type == ".pdf") {
+      // setShowImagemGreat(false)
+      setShowDocumentoItem({url:file,type:type})
+    }
+    else{
+      openDocument(file,type)
+    }
+  }
+
+  useEffect(()=>{
+    if(showDocumentoItem?.url) setShowDocumentoGreat(true)
+  },[showDocumentoItem])
+
 
   return (
     <LinearGradient colors={["#F7FAFC","#8BC4FD"]} style = {styles.container}>
@@ -435,7 +508,7 @@ export default function Relatorios() {
               renderItem={({item})=>(
 
                 <CardM5 
-                  imagePath={relatorio}
+                  imagePath={item.type=='documento'?relatorio:item.itens[1].url}
                   text1 = {`Enviado em ${parseDate(item.dataCadastro).day} de ${parseDate(item.dataCadastro).month} de ${parseDate(item.dataCadastro).year}`} 
                   text2 = {item.type=="imagem"?"imagens":"documentos"}
                   text3 = {`${item.cidade.charAt(0).toUpperCase() + item.cidade.slice(1).toLowerCase()}, ${item.uf.toUpperCase()}`}
@@ -444,23 +517,117 @@ export default function Relatorios() {
                   // selecting = {selecting}
                   // longPress={() => toggleselecting(true)}
                   // number={(it) => toggleNumber(it)}
+                  onPress={() => {setShowImagemItem(item.itens)}}
                 />
 
               )}
             />}
           </View>
+
         </View>
         
         {/* {visible && (<View style={styles.containerButtonsActions}>
           <ButtonComponentCircleM2 imagePath={heroicons_solid_download}/>
           <ButtonComponentCircleM2 imagePath={mdi_share}/> 
         </View>)} */}
+
+
+        <Modal
+          transparent
+          visible={showImagemGreat}
+          // visible={true}
+          animationType="fade"
+          onRequestClose={() => {setShowImagemGreat(false),setShowImagemItem([])}}
+        >
+          <View style = {styles.modal2}>
+            {showImagemItem.length>0 && showImagemItem[0].type=="documento"?
+              <View style={{backgroundColor:"#ffffff",flex:1,paddingTop:30}}>
+                <Text style={{fontWeight:"600", fontSize:22,width:"100%",color:"#146cc4ec",marginLeft:10, marginBottom:20}}>Documentos Enviados</Text>
+                <FlatList 
+                  contentContainerStyle ={styles.containerCards}
+                  data = {showImagemItem}
+                  keyExtractor={(item)=>item.id}
+                  extraData={showImagemItem}
+                  renderItem={({item})=>(
+                    <CardM41
+                      imagePath={item.url}
+                      name={item.nome}
+                      extecao={image(item.url)}
+                      text1={item.nome}
+                      text2={item.cidade.charAt(0).toUpperCase() + item.cidade.slice(1).toLowerCase()+", "+item.uf.toUpperCase()}
+                      text3={item.dataCadastro.split(" ")[0]}
+                      text4 = {`criado em ${item.dataCriacao}`}
+                      selecting={false}
+                      longPress={() => {}}
+                      number={(it) => {}}
+                      // view={(it) => {}}
+                      view={(it) => handleShowDocument(it,item.extencao)}
+                      action={(it) => {}}
+                    />
+                  )}
+                />
+              </View>
+            :
+              <FlatList 
+                contentContainerStyle ={styles.containerCards}
+                data = {showImagemItem}
+                keyExtractor={(item)=>item.id}
+                extraData={showImagemItem}
+                renderItem={({item})=>(
+                  <Image 
+                    source={{uri: `${item.url}` }}
+                    style={{ width: "100%", height: 400, resizeMode: "contain" }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+
+            }
+          </View>
+        </Modal>
+        <Modal
+          transparent
+          visible={showDocumentoGreat}
+          animationType="fade"
+          onRequestClose={() => {
+            setShowDocumentoGreat(false),
+            setShowDocumentoItem({url:"",type:""})
+            // setShowImagemGreat(true)
+          
+          }}
+        >
+          
+          <View style={styles.modal2}>
+            
+            {showDocumentoItem?.type==".pdf"?
+            <Pdf
+              trustAllCerts={false}
+              source={{uri:`${showDocumentoItem.url}`, cache: true,headers: { "User-Agent": "Mozilla/5.0" }}} 
+              style={{flex:1}} 
+            />:null}
+          </View>
+        </Modal>
       </View>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+
+  modal2: {
+    flex: 1,
+    backgroundColor: '#ffffffec',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding : 15
+  },
+  image:{
+    height : "100%",
+    width : "100%",
+  },
   container: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -857,7 +1024,8 @@ const styles = StyleSheet.create({
   containerCards:{
     width : '100%',
     flexDirection : 'column',
-    paddingHorizontal:24,
+    paddingHorizontal:10,
+    gap:5
   },
   containerButtonsActions :{
     position : 'absolute',

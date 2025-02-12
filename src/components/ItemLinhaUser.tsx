@@ -27,7 +27,7 @@ export const ItemLinhaUser  = ({ keyValue , value , colorValue,editable,onChange
   const color = editable ? '#A17D1C' : colorValue;
   const borderColor = editable ? '#F0E3C2' : "";
   const borderWidth = editable ? 1 : 0;
-  const Width = editable ? '80%' : '70%';
+  const Width = editable ? '80%' : '75%';
   
 
   return (
@@ -54,11 +54,13 @@ const styles = StyleSheet.create({
     width : '100%',
     height : 61,
     flexDirection:'row',
-    paddingHorizontal : 30,
+    paddingHorizontal : 10,
     paddingVertical : 10,
     borderBottomColor : '#00000036',
     borderBottomWidth : 0.75,
-    alignItems : 'center'
+    alignItems : 'center',
+    // backgroundColor:"#f80000",
+    justifyContent:'space-between'
 
   },
   
@@ -69,8 +71,9 @@ const styles = StyleSheet.create({
     fontWeight : '400',
     fontSize : 14,
     lineHeight : 21,
-    width : '30%',
+    width : '25%',
     textAlign : 'left',
+    // backgroundColor:"#fff"
   },
 
 
@@ -81,10 +84,11 @@ const styles = StyleSheet.create({
     fontWeight : '400',
     fontSize : 14,
     lineHeight : 21,
-    width : '70%',
+    width : '75%',
     textAlign : 'left',
     borderRadius: 12,
     paddingLeft: 10,
+    
   },
 
 
