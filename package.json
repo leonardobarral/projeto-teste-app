@@ -38,7 +38,7 @@
     "mime": "^4.0.4",
     "phosphor-react-native": "^2.2.1",
     "react": "18.2.0",
-    "react-native": "0.74.5",
+    "react-native": "^0.74.5",
     "react-native-blob-util": "^0.21.2",
     "react-native-element-dropdown": "^2.12.4",
     "react-native-file-viewer": "^2.1.5",
