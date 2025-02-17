@@ -1,4 +1,4 @@
-package com.app.atauan
+package com.eu.trabalhador
 
 import android.os.Build
 import android.os.Bundle

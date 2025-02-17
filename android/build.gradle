@@ -16,13 +16,12 @@ buildscript {
         maven { url 'https://www.jitpack.io' }
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:8.6.0')
-        classpath('com.facebook.react:react-native-gradle-plugin:0.72.4')
-        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0')
+        classpath('com.android.tools.build:gradle')
+        classpath('com.facebook.react:react-native-gradle-plugin')
+        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
         classpath('com.google.gms:google-services:4.4.2')
     }
 }
-
 
 apply plugin: "com.facebook.react.rootproject"
 
@@ -42,10 +41,9 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
-// allprojects {
-//     configurations.all {
-//         resolutionStrategy {
-//             force 'org.jetbrains.kotlin:kotlin-stdlib:2.1.0'
-//         }
-//     }
-// }
+configurations.all {
+    resolutionStrategy {
+        force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23'
+        force 'org.jetbrains.kotlin:kotlin-reflect:1.9.23'
+    }
+}

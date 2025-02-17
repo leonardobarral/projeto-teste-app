@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'Kruger'
+rootProject.name = 'Eu Trabalhador'
 
 dependencyResolutionManagement {
   versionCatalogs {
@@ -61,9 +61,6 @@ if (getRNMinorVersion() < 75) {
   apply from: new File(["node", "--print", "require.resolve('@react-native-community/cli-platform-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), "../native_modules.gradle");
   applyNativeModulesSettingsGradle(settings)
 }
-//_*_*
-include ':react-native-pdf'
-project(':react-native-pdf').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf/android')
 
 include ':app'
 includeBuild(new File(["node", "--print", "require.resolve('@react-native/gradle-plugin/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile())

@@ -15,10 +15,7 @@ def getRNVersion() {
   }.standardOutput.asText.get().trim()
 
   def coreVersion = version.split("-")[0]
-  // _*_
-//   def (major, minor, patch) = coreVersion.tokenize('.').collect { it.toInteger() }
-  //_*_*
-  def (major, minor, patch) = coreVersion.tokenize(".").collect { it.toInteger() }
+  def (major, minor, patch) = coreVersion.tokenize('.').collect { it.toInteger() }
 
   return versionToNumber(
       major,
@@ -33,22 +30,10 @@ def rnVersion = getRNVersion()
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
-
-    // _*_
     entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"].execute(null, rootDir).text.trim())
     reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
     codegenDir = new File(["node", "--print", "require.resolve('@react-native/codegen/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
-
-    // _*_*
-    // entryFile = file(providers.exec {
-    //     workingDir(rootDir)
-    //     commandLine("node", "-e", "console.log(require('expo/scripts/resolveAppEntry')())")
-    // }.standardOutput.asText.getOrElse("").trim())
-
-    // reactNativeDir = new File(providers.exec {workingDir(rootDir)commandLine("node", "--print", "require.resolve('react-native/package.json')")}.standardOutput.asText.get().trim()).getParentFile().getAbsoluteFile()
-    // hermesCommand = new File(providers.exec {workingDir(rootDir)commandLine("node", "--print", "require.resolve('react-native/package.json')")}.standardOutput.asText.get().trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
-    // codegenDir = new File(providers.exec {workingDir(rootDir)commandLine("node", "--print", "require.resolve('@react-native/codegen/package.json', { paths: [require.resolve('react-native/package.json')] })")}.standardOutput.asText.get().trim()).getParentFile().getAbsoluteFile()
 
     // Use Expo CLI to bundle the app, this ensures the Metro config
     // works correctly with Expo projects.
@@ -124,9 +109,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.app.atauan'
+    namespace 'com.eu.trabalhador'
     defaultConfig {
-        applicationId 'com.app.atauan'
+        applicationId 'com.eu.trabalhador'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -153,8 +138,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            // signingConfig signingConfigs.debug
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
@@ -162,7 +146,6 @@ android {
         }
     }
     packagingOptions {
-        //_*_*
         pickFirst 'lib/x86/libc++_shared.so'
         pickFirst 'lib/x86_64/libjsc.so'
         pickFirst 'lib/arm64-v8a/libjsc.so'
@@ -198,16 +181,9 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
     implementation project(':react-native-pdf')
-    
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))//configuração do firebase
-    // implementation 'com.google.firebase:firebase-analytics:21.5.0'
-    // implementation 'com.google.firebase:firebase-common:20.4.2'
-
-    implementation 'com.google.firebase:firebase-analytics'//incluo por último agora
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.0"//correção de versão de dependências
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-analytics")
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
@@ -226,22 +202,17 @@ dependencies {
             implementation("com.facebook.fresco:animated-webp:${reactAndroidLibs.versions.fresco.get()}")
         }
     }
-    //_*_
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
     }
-    //_*_*
-    // implementation jscFlavor
 }
-// configurations.all {
-//     resolutionStrategy {
-//         force 'org.jetbrains.kotlin:kotlin-stdlib:2.1.0'
-//     }
-// }
+
 if (rnVersion < versionToNumber(0, 75, 0)) {
     apply from: new File(["node", "--print", "require.resolve('@react-native-community/cli-platform-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), "../native_modules.gradle");
     applyNativeModulesAppBuildGradle(project)
 }
+
 apply plugin: 'com.google.gms.google-services'

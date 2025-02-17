@@ -19,7 +19,7 @@
         "foregroundImage": "./src/assets/images/icone.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.app.atauan"
+      "package": "com.eu.trabalhador"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
