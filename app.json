@@ -3,39 +3,11 @@
     "name": "Eu Trabalhador",
     "slug": "projeto-teste-app",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./src/assets/images/icone.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/icone.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.eu.trabalhador"
-    },
-    "web": {
-      "favicon": "./src/assets/favicon.png"
-    },
     "extra": {
       "eas": {
         "projectId": "00844620-f688-42cf-9829-a1e34bffa7e4"
       }
-    },
-
-    "plugins": [
-      
-      "expo-font"
-
-    ]
+    }
   }
 }
-
  

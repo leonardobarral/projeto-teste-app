@@ -108,6 +108,7 @@ export default function Cadastro() {
             }
             return true;
         }catch(error){
+            console.log(error)
             Alert.alert("Erro de Cadastro","Existe algum erro relacionado ao CPF inserido, contate o suporte do aplicativo!")
             return true
         }
