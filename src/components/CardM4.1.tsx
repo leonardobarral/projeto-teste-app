@@ -81,16 +81,16 @@ export const CardM41 = ({
       }
     }}     
     
-    onLongPress={()=>{
-      if(selecting){
-        toggleStatus(!status)
-      }
-      if(!selecting){
-        if(longPress)longPress()
-          toggleStatus(true)
-      }
+    // onLongPress={()=>{
+    //   if(selecting){
+    //     toggleStatus(!status)
+    //   }
+    //   if(!selecting){
+    //     if(longPress)longPress()
+    //       toggleStatus(true)
+    //   }
     
-    }}
+    // }}
     >
       <View style={styles.container}>
         <Image

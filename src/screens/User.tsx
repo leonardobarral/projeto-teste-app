@@ -207,7 +207,7 @@ export default function Login() {
       }
     }catch(error){
       setInitializing(false)
-      Alert.alert("Erro de atualização, tente novemente.");
+      Alert.alert("Erro de atualização, tente novamente.");
       console.log(error)
       setEditable(false)
     }
@@ -266,7 +266,7 @@ export default function Login() {
 
         <ItemLinhaUser keyValue = {"Nome"} value = {name} colorValue ={'#000000'} editable={editable} onChangeText={(it:string)=>setName(it)}/>
         <ItemLinhaUser keyValue = {"CPF"} value = {maskCPF(cpf)} colorValue ={'#00000036'} editable={false} onChangeText={(it:string)=>setCpf(it)}/>
-        <ItemLinhaUser keyValue = {"E-mail"} value = {email} colorValue ={'#000000'} editable={editable} onChangeText={(it:string)=>setEmail(it)}/>
+        <ItemLinhaUser keyValue = {"E-mail"} value = {email} colorValue ={'#00000036'} editable={false} onChangeText={(it:string)=>setEmail(it)}/>
         <ItemLinhaUser keyValue = {"Telefone"} value = {masTelefone(telefone)} colorValue ={'#000000'} editable={editable} onChangeText={(it:string)=>setTelefone(it)}/>
 
         <TouchableOpacity style={styles.button} onPress={()=>{
@@ -368,18 +368,19 @@ const styles = StyleSheet.create({
   textName:{
     height: 21,
     // fontFamily : 'Poppins',
-    color : '#00000059',
+    color : '#000acb',
     fontWeight : '400',
     fontSize : 14,
     lineHeight : 21,
     width : '100%',
     textAlign : 'center',
+    textDecorationLine:'underline'
   },
   textName2:{
     height: 21,
     // fontFamily : 'Poppins',
-    color : '#00000059',
-    fontWeight : '400',
+    color : '#000000',
+    fontWeight : '500',
     fontSize : 14,
     lineHeight : 21,
     width : '100%',

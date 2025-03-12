@@ -41,7 +41,8 @@ import {
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import doctypes from "../components/docTypes.json";
 import { NotFoundFile } from "../components/NotFoundFile";
-
+import check from "../assets/Check.png"
+import noCheck from "../assets/noCheck.png"
 import Pdf from 'react-native-pdf';
 
 import FileViewer from 'react-native-file-viewer';
@@ -58,7 +59,7 @@ export default function MeusArquivosDocumentos() {
   const [loadVisible, setloadVisible] = useState(false);
 
   const [showDocumentoGreat, setShowDocumentoGreat] = useState(false); 
-  const [showDocumentoItem, setShowDocumentoItem] = useState<{url:string,type:string}>();
+  const [showDocumentoItem, setShowDocumentoItem] = useState<{url:string,type:string,name:string}>();
   
   // ReactNativeBlobUtil.config({
   //   trusty: true,
@@ -78,8 +79,8 @@ export default function MeusArquivosDocumentos() {
     }
   };
 
-  const handleShowDocument=(file:string,type:string)=>{
-    if( type == ".pdf") setShowDocumentoItem({url:file,type:type})
+  const handleShowDocument=(file:string,type:string,name:string)=>{
+    if( type == ".pdf") setShowDocumentoItem({url:file,type:type,name:name})
     else{
       openDocument(file,type)
     }
@@ -166,6 +167,7 @@ export default function MeusArquivosDocumentos() {
   }, [listAction]);
 
   const [visible, setVisible] = useState(false);
+  const [visible2, setVisible2] = useState(false);
   const toggleVisible = (value: number) => {
     // console.log(true)
     if (value > 0) {
@@ -190,10 +192,28 @@ export default function MeusArquivosDocumentos() {
         .get();
 
       if (!snapshot.empty) {
-        const fileData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<fileDoc, "id">),
-        }));
+        const fileData = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<fileDoc, 'id'>),
+          }))
+          .sort((a, b) => {
+            const parseDate = (dateStr: string) => {
+              const [day, month, yearAndTime] = dateStr.split('/');
+              const [year, time] = yearAndTime.split(' ');
+              const [hours, minutes, seconds] = time.split(':');
+              return new Date(
+                parseInt(year),
+                parseInt(month) - 1,
+                parseInt(day),
+                parseInt(hours),
+                parseInt(minutes), 
+                parseInt(seconds),
+              );
+            };
+
+            return parseDate(b.dataCadastro).getTime() - parseDate(a.dataCadastro).getTime();
+          });
         // for (let i in fileData) console.log(i, "-", fileData[i].nome);
         setFiles(fileData);
         setSpiner(false)
@@ -218,9 +238,20 @@ export default function MeusArquivosDocumentos() {
     if (listAction.length === 1) await downloadFile(listAction);
     setloadVisible(false);
   };
-  const handleShareFile = async () => {
+  const hadleDowload2 = async (url:string,name:string) => {
+    setloadVisible(true);
+    if (url) await downloadFile([[url,name]]);
+    setloadVisible(false);
+  };
+  const handleShareFile = async () => { 
     if (listAction.length === 1) {
       const uri = await downloadFileTemporarioFile(listAction[0]);
+      if (uri) await shareFile(uri);
+    }
+  };
+  const handleShareFile2 = async (url:string) => {
+    if (url) {
+      const uri = await downloadFileTemporarioFile(url);
       if (uri) await shareFile(uri);
     }
   };
@@ -246,7 +277,7 @@ export default function MeusArquivosDocumentos() {
   };
 
   useEffect(()=>{
-    if(showDocumentoItem?.url) setShowDocumentoGreat(true)
+    if(showDocumentoItem?.url) setShowDocumentoGreat(true),setVisible2(true)
   },[showDocumentoItem])
 
   return (
@@ -268,8 +299,13 @@ export default function MeusArquivosDocumentos() {
                 toggleselecting(true);
               }
             }}
-          >
-            <Text style={styles.textSelection} allowFontScaling={false}>{textSelection}</Text>
+            style={{width:'100%', flexDirection:'row', justifyContent:'space-between', alignItems:'center', paddingHorizontal:45}}>
+
+            <Text style={styles.textSelection} allowFontScaling={false}>
+              {textSelection}
+            </Text>
+
+            <Image source={textSelection == "Selecionando" ? check : noCheck} style={{width: 20, height: 20}}/>
           </TouchableOpacity>
           <View style={styles.containerList}>
             {spiner?<ActivityIndicator size="large" />:
@@ -290,7 +326,7 @@ export default function MeusArquivosDocumentos() {
                   selecting={selecting}
                   longPress={() => toggleselecting(true)}
                   number={(it) => toggleNumber(it)}
-                  view={(it) => handleShowDocument(it,item.extencao)}
+                  view={(it) => handleShowDocument(it,item.extencao,item.nome)}
                   action={(it) => toogleListAction(it[0], it[1], it[2])}
                 />
               )}
@@ -313,6 +349,8 @@ export default function MeusArquivosDocumentos() {
           </View>
         )}
       </View>
+
+
       <Modal
         transparent
         visible={showDocumentoGreat}
@@ -328,8 +366,16 @@ export default function MeusArquivosDocumentos() {
             source={{uri:`${showDocumentoItem.url}`, cache: true,headers: { "User-Agent": "Mozilla/5.0" }}} 
             style={styles.pdf} 
           />:null}
+          {visible2 && (
+            <View style={styles.containerButtonsActions2}>
+              <ButtonComponentCircleM2 imagePath={mdi_share} onPress={()=>handleShareFile2(showDocumentoItem?showDocumentoItem.url:"")}/> 
+              <ButtonComponentCircleM2 imagePath={heroicons_solid_download} onPress={()=>showDocumentoItem?hadleDowload2(showDocumentoItem.url,showDocumentoItem?.name):""}/>
+            </View>
+          )}
         </View>
       </Modal>
+
+      {/* load */}
       <Modal
         transparent
         visible={loadVisible}
@@ -427,6 +473,17 @@ const styles = StyleSheet.create({
     right: 24,
     flexDirection: "column",
     justifyContent: "flex-end",
+  },
+  containerButtonsActions2: {
+    position: "absolute",
+    width: 75,
+    // height: 173,
+    bottom: 30,
+    gap: 23,
+    right: 24,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    zIndex: 99999,
   },
   modal: {
     width: "100%",

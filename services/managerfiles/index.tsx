@@ -424,6 +424,7 @@ const shareFiles = async (fileUri:string) => {
 export const downloadFile = async (listAction:any) => {
   try {
     console.log("downloadFiles - Iniciando download de arquivos");
+    console.log(listAction);
 
     for (const [url, name] of listAction) {
       console.log("downloadFiles - Baixando:", name);
@@ -460,6 +461,11 @@ export const downloadFile = async (listAction:any) => {
           if (downloadResult.status === 200) {
             // Compartilhar o arquivo baixado
             await shareFiles(downloadResult.uri);
+
+            Alert.alert('Sucesso', 'Arquivo baixado com sucesso!');
+
+
+            
           } else {
             console.error(`Falha ao baixar o arquivo ${name}`);
           }
@@ -469,7 +475,7 @@ export const downloadFile = async (listAction:any) => {
       }
     }
 
-    Alert.alert('Sucesso', 'Todos os arquivos foram baixados e salvos com sucesso.');
+    
   } catch (error) {
     console.error('Erro ao baixar ou salvar arquivos:', error);
     Alert.alert('Erro', 'Não foi possível baixar ou salvar todos os arquivos.');

@@ -241,7 +241,7 @@ export default function Cadastro() {
                 }
             }
         }catch(error){
-            Alert.alert("Erro de cadastro, tente novemente.");
+            Alert.alert("Erro de cadastro, tente novamente.");
             if (__DEV__) {
                 console.error("Erro durante o cadastro:", error);
             }

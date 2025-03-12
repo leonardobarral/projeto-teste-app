@@ -14,9 +14,7 @@ type Props = {
 };
 
 export const HeaderM4 = ({imagem,name,navigation,editable,edit,onchangeImage}:Props) => {
-  useEffect(()=>{
-    console.log(imagem)
-  },[])
+
   const insets = useSafeAreaInsets();
   const headerHeight = 150 + insets.top;
   return (

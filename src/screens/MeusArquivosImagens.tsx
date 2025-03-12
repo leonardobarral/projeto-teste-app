@@ -6,6 +6,8 @@ import { SetStateAction, useEffect, useState } from 'react';
 import { ButtonComponentCircleM2 } from '../components/ButtonComponentCircleM2';
 import img1 from "../assets/images/img1.png"
 import img2 from "../assets/images/img2.png"
+import check from "../assets/Check.png"
+import noCheck from "../assets/noCheck.png"
 import heroicons_solid_download from "../assets/images/heroicons_solid_download.png"
 import mdi_share from "../assets/images/mdi_share.png"
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -80,6 +82,8 @@ export default function MeusArquivosImagens() {
   
   
   const [visible, setVisible] = useState(false);
+  const [visible2, setVisible2] = useState(false);
+
   const toggleVisible = (value:number) => {
 
     if(value > 0){
@@ -87,6 +91,7 @@ export default function MeusArquivosImagens() {
     }else{
       setVisible(false)
     }
+
   };
 
   
@@ -106,15 +111,32 @@ export default function MeusArquivosImagens() {
       .where('uid', '==',user?.uid)
       .where('type','==','imagem')
       .where('status','==',true)
-      .orderBy('dataCadastro','asc')
+      .orderBy('dataCadastro','desc')
       .get();
 
       if (!snapshot.empty) {
-        const fileData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<fileDoc, 'id'>),
-        }));
-        for (let i in fileData) console.log(i,"-",fileData[i])
+        const fileData = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<fileDoc, 'id'>),
+          }))
+          .sort((a, b) => {
+            const parseDate = (dateStr: string) => {
+              const [day, month, yearAndTime] = dateStr.split('/');
+              const [year, time] = yearAndTime.split(' ');
+              const [hours, minutes, seconds] = time.split(':');
+              return new Date(
+                parseInt(year),
+                parseInt(month) - 1,
+                parseInt(day),
+                parseInt(hours),
+                parseInt(minutes),
+                parseInt(seconds),
+              );
+            };
+
+            return parseDate(b.dataCadastro).getTime() - parseDate(a.dataCadastro).getTime();
+          });
         setFiles(fileData);
         setSpiner(false)
       }
@@ -139,6 +161,15 @@ export default function MeusArquivosImagens() {
     if(listAction.length > 0) await downloadImage(listAction)
     setloadVisible(false)
   }
+  const hadleDowload2 = async (item:string)=>{
+    console.log("Baixando")
+    console.log(item)  
+    setloadVisible(true)
+    if(item) {
+      await downloadImage([item])
+    }
+    setloadVisible(false)
+  }
 
   const handleShareFile = async ()=>{
     if(listAction.length === 1){
@@ -147,8 +178,17 @@ export default function MeusArquivosImagens() {
     } 
   }
 
+  const handleShareFile2 = async (item:string)=>{
+    console.log("compartilhando")
+    console.log(item)
+    if(item) {
+      const uri = await downloadFileTemporarioFile(item)
+      if(uri) await shareFile(uri)
+    }
+  }
+
   useEffect(()=>{
-    if(showImagemItem) setShowImagemGreat(true)
+    if(showImagemItem) setShowImagemGreat(true),setVisible2(true)
   },[showImagemItem])
 
   return (
@@ -167,19 +207,25 @@ export default function MeusArquivosImagens() {
               if(!selecting){
                 toggleselecting(true);
               }
-            }}>
-            <Text style={styles.textSelection} allowFontScaling={false}>{textSelection}</Text>
+            }} style={{width:'100%', flexDirection:'row', justifyContent:'space-between', alignItems:'center', paddingHorizontal:45}}>
+
+            <Text style={styles.textSelection} allowFontScaling={false}>
+              {textSelection}
+            </Text>
+
+            <Image source={textSelection == "Selecionando" ? check : noCheck} style={{width: 20, height: 20}}/>
+          
           </TouchableOpacity>
 
           <View style = {styles.containerList}>
             {spiner?<ActivityIndicator size="large" />: 
             files.length == 0 ?<NotFoundFile value="Nenhuma imagem disponível!" />:
-            <FlatList 
+            <FlatList
               contentContainerStyle ={styles.containerCards}
               data = {files}
               keyExtractor={(item)=>item.id}
               renderItem={({item})=>(
-                <CardM3 
+                <CardM3
                   imagePath={item.url} 
                   text1 = {`Enviado em ${item.dataCadastro.split(" ")[0]}`}
                   text2 = {`${item.cidade.charAt(0).toUpperCase() + item.cidade.slice(1).toLowerCase()}, ${item.uf.toLocaleUpperCase()}`}
@@ -198,22 +244,28 @@ export default function MeusArquivosImagens() {
           {/* <View style={{height:bottomPadding}}></View> */}
         </View>
         
+
         {visible && (<View style={styles.containerButtonsActions}>
           {visibleButtonShare && <ButtonComponentCircleM2 imagePath={mdi_share} onPress={()=>handleShareFile()}/> } 
           <ButtonComponentCircleM2 imagePath={heroicons_solid_download} onPress={()=>hadleDowload()}/>
         </View>)}
+
       </View>
 
       <Modal
         transparent
         visible={showImagemGreat}
         animationType="fade"
-        onRequestClose={() => {setShowImagemGreat(false),setShowImagemItem("")}}
+        onRequestClose={() => {setShowImagemGreat(false),setShowImagemItem(""),setVisible2(false)}}
       >
         <TouchableOpacity
           style={styles.modal2}
           activeOpacity={0.4}      
-          onPressOut={() => {setShowImagemGreat(false),setShowImagemItem("")}}
+          onPressOut={() => {
+            setShowImagemGreat(false),
+            setShowImagemItem(""),
+            setVisible2(false)
+          }}
         >
           <View style = {{flex:1,justifyContent : 'center',alignItems:'center'}}>
             <Image 
@@ -221,9 +273,17 @@ export default function MeusArquivosImagens() {
               style={styles.image}
               resizeMode="contain"
             />
+            {visible2 && (
+              <View style={styles.containerButtonsActions2}>
+                <ButtonComponentCircleM2 imagePath={mdi_share} onPress={()=>handleShareFile2(showImagemItem)}/> 
+                <ButtonComponentCircleM2 imagePath={heroicons_solid_download} onPress={()=>hadleDowload2(showImagemItem)}/>
+              </View>
+            )}
           </View>
         </TouchableOpacity>
       </Modal>
+
+
       <Modal
         transparent
         visible={loadVisible}
@@ -306,6 +366,18 @@ const styles = StyleSheet.create({
     right : 24,
     flexDirection:'column',
     justifyContent: 'flex-end'
+  },
+  containerButtonsActions2 :{
+    position : 'absolute',
+    width : 75,
+    // height :200,
+    bottom : 30,
+    gap : 23,
+    right : 24,
+    flexDirection:'row',
+    justifyContent: 'flex-end',
+    zIndex: 99999,
+    // backgroundColor:"#d80606"
   },
   modal:{
     width : '100%',

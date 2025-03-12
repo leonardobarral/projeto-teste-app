@@ -15,6 +15,10 @@ import iconamoon_arrow from "../assets/images/iconamoon_arrow.png"
 import firestore from "@react-native-firebase/firestore"
 
 
+import heroicons_solid_download from "../assets/images/heroicons_solid_download.png"
+import mdi_share from "../assets/images/mdi_share.png"
+
+
 
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {  SafeAreaView} from 'react-native';
@@ -22,7 +26,7 @@ import {useNavigation} from '@react-navigation/native'
 import { AppStack } from '../routes/AppStack'
 import { Bar } from '../components/Bar';
 import { fileDoc, handleError, records, useUser } from '../context/Auth';
-import { file } from '../../services/managerfiles';
+import { downloadFile, downloadFileTemporarioFile, downloadImage, file, shareFile } from '../../services/managerfiles';
 
 import { Dropdown } from "react-native-element-dropdown";
 
@@ -53,6 +57,8 @@ export default function Relatorios() {
   const [originalFiles, setOriginalFiles] = useState<fileDoc[]>([]);
   const [filesOk, setFilesOk] = useState(false);
   const [reports, setReports] = useState<records[]>([]);
+
+  const [loadVisible, setloadVisible] = useState(false);
   
   const [notFoundFile, setNotFoundFile] = useState(false);
   const [spiner, setSpiner] = useState(false);
@@ -76,6 +82,8 @@ export default function Relatorios() {
 
   const [showImagemGreat, setShowImagemGreat] = useState(false); 
   const [showImagemItem, setShowImagemItem] = useState<fileDoc[]>([]);
+  const [showImagemSelecionada, setShowImagemSelecionada] = useState(false); 
+  const [showImagemItemSelecionada, setShowImagemItemSelecionada] = useState("");
 
   // const [visibleBar, setvisibleBar] = useState(false);
   
@@ -118,6 +126,38 @@ export default function Relatorios() {
       
   //   }
   // };
+
+    const hadleDowload2 = async (item:string)=>{
+      console.log("Baixando")
+      console.log(item)  
+      setloadVisible(true)
+      if(item) {
+        await downloadImage([item])
+      }
+      setloadVisible(false)
+    }
+
+    const handleShareFile2 = async (item:string)=>{
+      console.log("compartilhando")
+      console.log(item)
+      if(item) {
+        const uri = await downloadFileTemporarioFile(item)
+        if(uri) await shareFile(uri)
+      }
+    }
+
+    const hadleDowload3 = async (url:string,name:string) => {
+      setloadVisible(true);
+      if (url) await downloadFile([[url,name]]);
+      setloadVisible(false);
+    };
+
+    const handleShareFile3 = async (url:string) => {
+      if (url) {
+        const uri = await downloadFileTemporarioFile(url);
+        if (uri) await shareFile(uri);
+      }
+    };
 
   const getFileExtension = (url: string): string => {
     const match = url.match(/\.([a-zA-Z0-9]+)(\?|$)/);
@@ -165,7 +205,7 @@ export default function Relatorios() {
             }
           }
         )
-        for (let i in fileData) console.log(i,"-",fileData[i])
+        // for (let i in fileData) console.log(i,"-",fileData[i])
         setOriginalFiles(fileData); 
         if((filterDataMin||filterDataMax)&&!alertData2&&!alertData1) await filterData(fileData,filterDataMin,filterDataMax)
         else {
@@ -185,7 +225,7 @@ export default function Relatorios() {
   const filterData = async (filesnew:fileDoc[],dmin:string,dmax:string)=>{
     setSpiner(true)
     let newFiles = filesnew;
-    console.log("antes",newFiles)
+    // console.log("antes",newFiles)
     if(!alertData2&&!alertData1){
       if(dmin)
         newFiles = newFiles.filter((elemento)=>{
@@ -195,7 +235,7 @@ export default function Relatorios() {
         newFiles = newFiles.filter((elemento)=>{
          return new Date(elemento.dataCriacao.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1")) <= new Date(dmax.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1"))
         }) 
-      console.log("depois",newFiles)
+      // console.log("depois",newFiles)
 
       if(files.length == 0) setNotFoundFile(true)
     
@@ -266,10 +306,10 @@ export default function Relatorios() {
         }, {} as Record<string, records>)
     );
 
-    console.log(groupedFiles)
+    // console.log(groupedFiles)
 
     if(order == 'asc') groupedFiles.sort((a,b)=> a.timestamp - b.timestamp) //(antigo → novo)
-    if(order == 'desc') groupedFiles.sort((a,b)=> b.timestamp - a.timestamp) //(novo → antigo)
+    else groupedFiles.sort((a,b)=> b.timestamp - a.timestamp) //(novo → antigo)
     
     setReports(groupedFiles)
     setSpiner(false)
@@ -297,7 +337,7 @@ export default function Relatorios() {
 
 
   const [showDocumentoGreat, setShowDocumentoGreat] = useState(false); 
-  const [showDocumentoItem, setShowDocumentoItem] = useState<{url:string,type:string}>();
+  const [showDocumentoItem, setShowDocumentoItem] = useState<{url:string,type:string,name:string}>();
   
   const openDocument = async (file:string,type:string) => {
       const fileUrl = file
@@ -311,10 +351,10 @@ export default function Relatorios() {
         Alert.alert('Erro', 'Não foi possível abrir o documento.');
       }
     };
-  const handleShowDocument=(file:string,type:string)=>{
+  const handleShowDocument=(file:string,type:string,name:string)=>{
     if( type == ".pdf") {
       // setShowImagemGreat(false)
-      setShowDocumentoItem({url:file,type:type})
+      setShowDocumentoItem({url:file,type:type,name:name})
     }
     else{
       openDocument(file,type)
@@ -506,20 +546,15 @@ export default function Relatorios() {
               data = {reports}
               keyExtractor={(item)=>item.id}
               renderItem={({item})=>(
-
                 <CardM5 
-                  imagePath={item.type=='documento'?relatorio:item.itens[1].url}
+                  imagePath={item.type == 'documento' ? relatorio : item.itens[0].url}
                   text1 = {`Enviado em ${parseDate(item.dataCadastro).day} de ${parseDate(item.dataCadastro).month} de ${parseDate(item.dataCadastro).year}`} 
                   text2 = {item.type=="imagem"?"imagens":"documentos"}
                   text3 = {`${item.cidade.charAt(0).toUpperCase() + item.cidade.slice(1).toLowerCase()}, ${item.uf.toUpperCase()}`}
                   text4 = {`criado em ${parseDate(item.dataCriacao).day} de ${parseDate(item.dataCriacao).month} de ${parseDate(item.dataCriacao).year}`}
                   text5 = {`${item.quantidade} ${item.quantidade > 1?"itens":"item"}`}
-                  // selecting = {selecting}
-                  // longPress={() => toggleselecting(true)}
-                  // number={(it) => toggleNumber(it)}
                   onPress={() => {setShowImagemItem(item.itens)}}
                 />
-
               )}
             />}
           </View>
@@ -531,7 +566,7 @@ export default function Relatorios() {
           <ButtonComponentCircleM2 imagePath={mdi_share}/> 
         </View>)} */}
 
-
+        {/* Modal de imagens */}
         <Modal
           transparent
           visible={showImagemGreat}
@@ -561,7 +596,7 @@ export default function Relatorios() {
                       longPress={() => {}}
                       number={(it) => {}}
                       // view={(it) => {}}
-                      view={(it) => handleShowDocument(it,item.extencao)}
+                      view={(it) => handleShowDocument(it,item.extencao,item.nome)}
                       action={(it) => {}}
                     />
                   )}
@@ -574,24 +609,37 @@ export default function Relatorios() {
                 keyExtractor={(item)=>item.id}
                 extraData={showImagemItem}
                 renderItem={({item})=>(
-                  <Image 
-                    source={{uri: `${item.url}` }}
-                    style={{ width: "100%", height: 400, resizeMode: "contain" }}
-                    resizeMode="contain"
-                  />
+                  <>
+                    <TouchableOpacity
+                      onPress={() =>{
+                        setShowImagemItemSelecionada(item.url)
+                        setShowImagemSelecionada(true)}
+                      }
+                    >
+                      <Image 
+                        source={{uri: `${item.url}` }}
+                        style={{ width: "100%", height: 400, resizeMode: "contain" }}
+                        resizeMode="contain"
+                      />
+                    </TouchableOpacity>
+                    
+                  </>
+                  
                 )}
               />
 
             }
           </View>
         </Modal>
+
+        {/* Modal de exibição de PDFs*/}
         <Modal
           transparent
           visible={showDocumentoGreat}
           animationType="fade"
           onRequestClose={() => {
             setShowDocumentoGreat(false),
-            setShowDocumentoItem({url:"",type:""})
+            setShowDocumentoItem({url:"",type:"",name:""})
             // setShowImagemGreat(true)
           
           }}
@@ -605,8 +653,59 @@ export default function Relatorios() {
               source={{uri:`${showDocumentoItem.url}`, cache: true,headers: { "User-Agent": "Mozilla/5.0" }}} 
               style={{flex:1}} 
             />:null}
+            <View style={styles.containerButtonsActions2}>
+              <ButtonComponentCircleM2 imagePath={mdi_share} onPress={()=>handleShareFile3(showDocumentoItem?showDocumentoItem.url:"")}/> 
+              <ButtonComponentCircleM2 imagePath={heroicons_solid_download} onPress={()=>showDocumentoItem?hadleDowload3(showDocumentoItem.url,showDocumentoItem?.name):""}/>
+            </View>
           </View>
         </Modal>
+
+        <Modal
+          transparent
+          visible={showImagemSelecionada}
+          animationType="fade"
+          onRequestClose={() => {setShowImagemSelecionada(false),setShowImagemItemSelecionada("")}}
+        >
+          <TouchableOpacity
+            style={styles.modal3}
+            activeOpacity={0.4}      
+            onPressOut={() => {
+              setShowImagemSelecionada(false),
+              setShowImagemItemSelecionada("")
+            }}
+          >
+            <View style = {{flex:1,justifyContent : 'center',alignItems:'center'}}>
+              <Image 
+                source={{uri: `${showImagemItemSelecionada}` }}
+                style={styles.image}
+                resizeMode="contain"
+              />
+              
+              <View style={styles.containerButtonsActions2}>
+                <ButtonComponentCircleM2 imagePath={mdi_share} onPress={()=>handleShareFile2(showImagemItemSelecionada)}/> 
+                <ButtonComponentCircleM2 imagePath={heroicons_solid_download} onPress={()=>hadleDowload2(showImagemItemSelecionada)}/>
+              </View>
+              
+            </View>
+          </TouchableOpacity>
+        </Modal>
+        {/* Load */}
+        <Modal
+                transparent
+                visible={loadVisible}
+                animationType="fade"
+                // onRequestClose={() => {setVisiblemodal2(false),setEmailNewPassword("")}}
+              >
+                <TouchableOpacity
+                  style={styles.modal2}
+                  activeOpacity={0.4}      
+                  // onPressOut={() => {setVisiblemodal2(false),setEmailNewPassword("")}}
+                >
+                  <View style = {{flex:1,justifyContent : 'center',alignItems:'center'}}>
+                    <ActivityIndicator size = {'large'} color={Colors.primary}/>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
       </View>
     </LinearGradient>
   );
@@ -623,6 +722,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding : 15
+  },
+  modal3: {
+    flex: 1,
+    backgroundColor: '#ffffffec',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding : 15,
+    zIndex:99999
   },
   image:{
     height : "100%",
@@ -1040,5 +1150,17 @@ const styles = StyleSheet.create({
   modal:{
     width : '100%',
     height : "100%"
-  }
+  },
+  containerButtonsActions2 :{
+    position : 'absolute',
+    width : 75,
+    // height :200,
+    bottom : 30,
+    gap : 23,
+    right : 24,
+    flexDirection:'row',
+    justifyContent: 'flex-end',
+    zIndex: 99999,
+    // backgroundColor:"#d80606"
+  },
 });
