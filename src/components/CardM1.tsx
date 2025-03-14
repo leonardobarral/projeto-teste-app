@@ -38,18 +38,18 @@ const styles = StyleSheet.create({
     elevation: 10, 
   },
   image:{
-    height : 50,
-    width : 50,
+    height : 70,
+    width : 70,
   },
   text: {
-    color: '#000000',
-    fontSize: 14,
+    color: '#646464',
+    fontSize: 24,
     // fontFamily: 'DM_Sans',
     fontWeight: '700',
-    lineHeight: 18.23,
+    lineHeight: 32,
     alignContent:'center',
     textAlign: 'center',
-    height: 18,
+    height: 32,
   },
 });
 

@@ -77,7 +77,7 @@ export const Bar = () => {
                 handleActionLink(3)
               }}
               >
-              Vizualizar imagens
+              Abrir imagens
             </Text>
             <Text allowFontScaling={false} style = {[styles.textBar, isUnderlined4 && styles.underlinedText]} 
               onPress={()=>{
@@ -85,7 +85,7 @@ export const Bar = () => {
                 handleActionLink(4)
               }}
               >
-              Vizualizar documentos
+              Abrir documentos
             </Text>
           </View>
           <View style ={styles.linefooter}> 
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   textBar: {
     paddingLeft: 10,
     color: '#3f444d',
-    fontSize: 16,
+    fontSize: 20,
     width:'100%',
     // fontFamily: 'DM_Sans',
     fontWeight: '600',

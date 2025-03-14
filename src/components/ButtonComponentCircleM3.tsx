@@ -24,16 +24,17 @@ export const ButtonComponentCircleM3 = ({imagePath, text, funcionpress}:Props) =
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#ffffff0',
-    borderRadius: 75,
+    // backgroundColor: '#ffffff0',
+    // borderRadius: 75,
     flexDirection : 'column',
     alignItems: 'center',
     verticalAlign: 'middle',
     justifyContent: 'center',
-    width: 100,
+    width: "50%",
     height: 92,
     padding : 10,
-    gap: 4
+    gap: 4,
+    // backgroundColor : '#bf1313',
   },
   containerimage:{
     height : 70,
@@ -55,13 +56,13 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: 24,
     // fontFamily: 'DM_Sans',
     fontWeight: '700',
-    lineHeight: 18.23,
+    lineHeight: 32,
     alignContent:'center',
     textAlign: 'center',
-    height: 18,
+    height: 32,
   },
 });
 

@@ -10,7 +10,7 @@ import { CardM1 } from '../components/CardM1';
 import Plus from "../assets/images/Plus.png"
 import Camera from "../assets/images/Camera.png"
 import Folder from "../assets/images/Folder.png"
-import Paper from "../assets/images/Paper.png"
+import Paper from "../assets/images/Paper.jpeg"
 import { Popupcarregar } from '../components/Popupcarregar';
 import { useEffect, useState } from 'react';
 // import { StatusBar } from 'expo-status-bar';
@@ -248,7 +248,7 @@ export default function Home() {
           page = {"MeusArquivos"}/>
           <CardM1 
           imagePath={Paper} 
-          text = {"Relatório de atividades"} 
+          text = {"Hitórico"} 
           page = {"Relatorios"}/>
         </View>
       </View>

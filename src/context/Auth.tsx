@@ -55,12 +55,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
   const [visibleBar , setVisibleBar] = useState(false);
   const [action , setAction] = useState('');
   const [loged , setLoged] = useState(false);
+
+
   
   useEffect(() => { 
     console.log("v1 - ",action)
     if(action == "cadastro") {
       return
     }
+
+    
+
+
     else if(action=='login'){
       const unsubscribe = auth().onAuthStateChanged(async(_user)=>{
         try{
@@ -146,12 +152,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
 
     if(!action) setInitializing(false)
 
-  },[action])
+  },[action]) 
 
-  useEffect(()=>{loadFromStorage()},[])
+  useEffect(()=>{loadFromStorage()},[]) 
 
   async function loadFromStorage(){
+    setAction("login")
+    setInitializing(true)
     const userLoged = await AsyncStorage.getItem('@user')
+
+    console.log("v1 - User",userLoged)
+
     if(userLoged){
       setUser(JSON.parse(userLoged) as FirebaseAuthTypes.User)
     }

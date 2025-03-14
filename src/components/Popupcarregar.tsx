@@ -14,7 +14,7 @@ export const Popupcarregar = ({gallery,files}:Props) => {
     <View style={styles.container}>       
       <View style={styles.containerbuttons}>  
         <ButtonComponentCircleM3 imagePath={Gallery} text = {"Fotos"} funcionpress = {gallery}/>
-        <ButtonComponentCircleM3 imagePath={Document} text = {"Documento"} funcionpress = {files}/>
+        <ButtonComponentCircleM3 imagePath={Document} text = {"Documentos"} funcionpress = {files}/>
       </View>
     </View>
   );
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     alignItems : 'center'
   },
   containerbuttons : {
-    width: 200,
+    width: '100%',
     height: 92,
     flexDirection :'row',
     justifyContent : 'space-between'

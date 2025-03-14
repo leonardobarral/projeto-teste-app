@@ -22,6 +22,7 @@ export const ButtonComponentCircle = ({ imagePath, text, onPress}:Props) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#ffffff',
+    // backgroundColor: '#f40000',
     borderRadius: 75,
     flexDirection : 'column',
     alignItems: 'center',
@@ -38,18 +39,22 @@ const styles = StyleSheet.create({
     gap:10,
   },
   image:{
-    height : 40,
-    width : 40,
+    height : 50,
+    width : 50,
+    // position: 'absolute',
+    alignContent:'center',
+    // backgroundColor: '#f40000',
   },
   text: {
-    color: '#000000',
-    fontSize: 14,
+    color:'#646464',
+    fontSize: 24,
     // fontFamily: 'DM_Sans',
     fontWeight: '700',
-    lineHeight: 18.23,
+    lineHeight: 32,
     alignContent:'center',
     textAlign: 'center',
-    height: 18,
+    height: 32,
+    // backgroundColor: '#bebebe',
   },
 });
 
