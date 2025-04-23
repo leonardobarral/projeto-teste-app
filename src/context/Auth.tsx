@@ -160,11 +160,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
     setAction("login")
     setInitializing(true)
     const userLoged = await AsyncStorage.getItem('@user')
-
     console.log("v1 - User",userLoged)
-
     if(userLoged){
       setUser(JSON.parse(userLoged) as FirebaseAuthTypes.User)
+    }else{
+      await AsyncStorage.removeItem("@user");
+      setAction("")
     }
   }
 
@@ -228,6 +229,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children})=>{
       setInitializing(true)
       setLoged(false)
       await auth().signOut()
+      await AsyncStorage.removeItem("@user");
       setInitializing(false)
     }catch (error) {
       Alert.alert("Erro ao fazer logout, tente novamente!");

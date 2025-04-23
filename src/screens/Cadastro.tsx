@@ -226,16 +226,22 @@ export default function Cadastro() {
                     const emailPublicoCollectionRef = firestore().collection("email_publico")
                     await emailPublicoCollectionRef.doc(currentUserId).set({email:userObjeto.email});
                     
-                    await auth().signOut()
+                    setTimeout(async () => { 
+                        await auth().signOut()
+                    }, 500);
+                
                     await AsyncStorage.removeItem("@user");
+
                     setAction("")
 
                     setTimeout(async () => { 
                         setInitializing(false)
                     }, 500);
+
+                    setTimeout(async () => { 
+                        navigation.navigate('Login')
+                    }, 500);
                     
-                    
-                    navigation.navigate('Login')
                     Alert.alert(
                         "Conta cadastrada com sucesso!",
                         "Foi enviado uma mensagem de confirmação de cadastro para o e-mail cadastrado!"
