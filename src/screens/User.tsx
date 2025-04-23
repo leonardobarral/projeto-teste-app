@@ -103,7 +103,10 @@ export default function Login() {
 
 
   const maskFirtsName = (name:string)=>{
-    if(name) return name.split(" ")[0]
+    if (name) {
+      const primeiraParte = name.split(" ")[0].split(".")[0].toLowerCase();
+      return primeiraParte.charAt(0).toUpperCase() + primeiraParte.slice(1);
+    }
     else return name
   }
 

@@ -30,7 +30,7 @@ export const HeaderM4 = ({imagem,name,navigation,editable,edit,onchangeImage}:Pr
             <View style = {styles.button}>
               <ButtonBack navigation={navigation}/>
             </View>
-            <Text allowFontScaling={false} style={styles.titleName}>{name}</Text>
+            <Text allowFontScaling={false} style={styles.titleName}>{name.length > 15 ?name.slice(0, 15) + '...':name}</Text>
             <View style = {styles.button}>
               <ButtonEdit press={(it:boolean)=>{
                 if(edit){
