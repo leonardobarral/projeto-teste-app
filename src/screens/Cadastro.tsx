@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import {validarCPF,validarEmail} from '../context/Validador'
 import {useUser} from '../context/Auth'
 import { InputPassword } from '../components/InputPassword';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -226,6 +227,8 @@ export default function Cadastro() {
                     await emailPublicoCollectionRef.doc(currentUserId).set({email:userObjeto.email});
                     
                     await auth().signOut()
+                    await AsyncStorage.removeItem("@user");
+                    setAction("")
 
                     setTimeout(async () => { 
                         setInitializing(false)
