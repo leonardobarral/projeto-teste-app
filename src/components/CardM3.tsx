@@ -90,7 +90,7 @@ export const CardM3 = ({
         />
         <View style = {styles.containerText}>
           <Text allowFontScaling={false} style={styles.text1} numberOfLines={2} ellipsizeMode="tail">{text1}</Text>
-          <Text allowFontScaling={false} style={styles.text2}>{text2}</Text>
+          <Text allowFontScaling={false} style={styles.text2}>{"Cidade, UF"}</Text>
           <Text allowFontScaling={false} style={styles.text3}>{text3}</Text>
           {text4 ?<Text allowFontScaling={false} style={styles.text3}>{text4}</Text>:null}
         </View>

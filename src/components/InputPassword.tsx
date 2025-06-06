@@ -44,6 +44,8 @@ export const InputPassword = (
   return (
     <View style={styles.containerInput}>
       <TextInput style={styles.input}
+        autoComplete="off"
+        importantForAutofill="no"
         ref={inputRef} 
         placeholder= {placeHolder}
         value = {text}

@@ -27,7 +27,7 @@ export const ItemLinhaUser  = ({ keyValue , value , colorValue,editable,onChange
   const color = editable ? '#A17D1C' : colorValue;
   const borderColor = editable ? '#F0E3C2' : "";
   const borderWidth = editable ? 1 : 0;
-  const Width = editable ? '80%' : '75%';
+  const Width = editable ? '80%' : '80%';
   
 
   return (
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     fontWeight : '400',
     fontSize : 14,
     lineHeight : 21,
-    width : '25%',
+    width : '20%',
     textAlign : 'left',
     // backgroundColor:"#fff"
   },
@@ -84,14 +84,13 @@ const styles = StyleSheet.create({
     fontWeight : '400',
     fontSize : 14,
     lineHeight : 21,
-    width : '75%',
+    width : '80%',
     textAlign : 'left',
     borderRadius: 12,
     paddingLeft: 10,
-    
+    // backgroundColor: '#e00d0d',
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
-
-
-
 });
 

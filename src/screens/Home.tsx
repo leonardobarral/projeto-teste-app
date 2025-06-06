@@ -252,7 +252,7 @@ export default function Home() {
           page = {"MeusArquivos"}/>
           <CardM1 
           imagePath={Paper} 
-          text = {"Hitórico"} 
+          text = {"Histórico"} 
           page = {"Relatorios"}/>
         </View>
       </View>
